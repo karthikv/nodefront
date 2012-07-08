@@ -13,8 +13,10 @@
     "dependencies": {
         "commander": "0.5.2",
         "jade": "0.26.3",
+        "mime": "1.2.6",
         "nconf": "0.6.0",
         "q": "0.8.5",
+        "socket.io": "0.9.6",
         "stylus": "0.27.2"
     }
 }

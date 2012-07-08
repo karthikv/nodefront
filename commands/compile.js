@@ -35,16 +35,69 @@ var rStylusInclude = /^[ \t]*@import[ \t]+([^\n]+)/gm;
  * *.html and *.css.
  *
  * @param env - the command-line environment
- *  If the -r/--recursive parameter is specified, the current directory is
+ *  If the -r/--recursive flag is specified, the current directory is
  *  recursively searched for target files.
  *
- *  If the -w/--watch parameter is specified, target files are recompiled upon
+ *  If the -w/--watch flag is specified, target files are recompiled upon
  *  modification. Dependencies are also evaluated so that if, for example,
  *  layout.jade includes index.jade, when index.jade is modified, both
  *  index.jade and layout.jade are recompiled. This is referred to as
  *  "dependency-intelligent" recompilation
+ *
+ *  If the -s/--serve <port> flag is specified, the files in the current
+ *  directory are served on localhost at the given port number, which
+ *  defaults to 3000.
+ *
+ *  If the -l/--live <port> flag is specified, -w/--watch and -s/--serve <port>
+ *  are implied. Not only are files recompiled upon modification, but the
+ *  browser is also automatically updated when corresponding HTML/CSS/JS/Jade/
+ *  Stylus files are altered. In the case of CSS/Stylus, link tags on the page
+ *  are simply removed and re-added. For HTML/JS/Jade, the browser is refreshed
+ *  entirely.
  */
 module.exports = exports = function(env) {
+  var server;
+  var io;
+  var localRootDir = pathLib.resolve('.');
+
+  if (env.serve || env.live) {
+    // serve the files on localhost
+    if (typeof env.serve == 'number') {
+      server = serveFilesLocally(env.serve, env.live);
+    } else {
+      server = serveFilesLocally(3000, env.live);
+    }
+  }
+
+  if (env.live) {
+    // initiate the socket connection
+    io = require('socket.io').listen(server);
+
+    io.sockets.on('connection', function(socket) {
+      socket.on('resolvePaths', function(paths) {
+        var resolvedPaths = [];
+        var absPath;
+
+        // use path library to resolve paths
+        resolvedPaths[0] = pathLib.resolve('.' + paths[0]);
+        resolvedPaths[1] = {};
+        resolvedPaths[2] = {};
+
+        // resolve each path in the latter two arrays, keeping track of the new
+        // path and original in a map of new => original
+        for (var i = 1; i <= 2; i++) {
+          for (var j = 0; j < paths[i].length; j++) {
+            absPath = pathLib.resolve('.' + paths[i][j]);
+            resolvedPaths[i][absPath] = paths[i][j];
+          }
+        }
+
+        // let the client know
+        socket.emit('pathsResolved', resolvedPaths);
+      });
+    });
+  }
+
   findFilesToCompile(env.recursive)
     .then(function(compileData) {
       // process each file to compile
@@ -58,19 +111,110 @@ module.exports = exports = function(env) {
 
         // compile the current file and record this function
         var compileFn = generateCompileFn(fileNameSansExtension, extension,
-            contents);
+            contents, env.live);
         compileFns[fileName] = compileFn;
         compileFn();
 
-        if (env.watch) {
+        if (env.watch || env.live) {
           // record dependencies for dependency-intelligent recompilation
           recordDependencies(fileName, extension, contents);
-          recompileUponModification(fileName, extension);
+          recompileUponModification(fileName, extension, io);
         }
       });
     })
     .fail(utils.throwError);
+
+  if (env.live) {
+    // communicate to client whenever file is modified
+    trackModificationsLive(io, env.recursive);
+  }
 };
+
+/**
+ * Function: trackModificationsLive
+ * --------------------------------
+ * Watch all HTML, CSS, and JS files for modifications. Emit a fileModified
+ * event to the client upon modification to allow for live refreshes.
+ *
+ * @param io - socket.io connection if this is live mode
+ * @param recursive - true to watch all files in subdirectories as well
+ */
+function trackModificationsLive(io, recursive) {
+  utils.readDirWithFilter('.', true, /\.(html|css|js)$/, true)
+    .then(function(files) {
+      files.forEach(function(fileName) {
+        // use a small interval for quick live refreshes
+        utils.watchFileForModification(fileName, 200, function() {
+          io.sockets.emit('fileModified', fileName);
+        });
+      });
+    });
+}
+
+/**
+ * Function: serveFilesLocally
+ * ---------------------------
+ * Serves the files in the current directory on localhost at the given port
+ * number.
+ *
+ * @param port - the port number to serve the files on
+ * @param live - true if this is live mode
+ *
+ * @return the node HTTP server
+ */
+function serveFilesLocally(port, live) {
+  var http = require('http');
+  var mime = require('mime');
+
+  if (live) {
+    // scripts to dynamically insert into html pages
+    var scripts = '<script src="/socket.io/socket.io.js"></script>' +
+      '<script src="/nodefront/live.js"></script>';
+  }
+
+  var server = http.createServer(function(request, response) {
+    if (request.method == 'GET') {
+      // file path in current directory
+      var path = '.' + request.url.split('?')[0];
+      var mimeType;
+
+      // redirect /nodefront/live.js request to nodefront's live.js
+      if (live && path == './nodefront/live.js') {
+        path = pathLib.resolve(__dirname + '/../live.js');
+      }
+
+      // if file exists, serve it; otherwise, return a 404
+      q.ncall(fs.readFile, fs, path, 'utf-8')
+        .then(function(contents) {
+          // find this file's mime type or default to text/plain
+          mimeType = mime.lookup(path, 'text/plain');
+          response.writeHead(200, {'Content-Type': mimeType});
+
+          if (live && mimeType === 'text/html') {
+            // add scripts before end body tag
+            contents = contents.replace('</body>', scripts + '</body>');
+
+            // if no end body tag is present, just append scripts
+            if (contents.indexOf(scripts) === -1) {
+              contents = contents + scripts;
+            }
+          }
+
+          response.end(contents);
+        }, function(err) {
+          response.writeHead(404, {'Content-Type': 'text/plain'});
+          response.end('File not found.');
+        }).fail(utils.throwError);
+    } else {
+      // bad request error code
+      response.writeHead(400, {'Content-Type': 'text/plain'});
+      response.end('Unsupported request type.');
+    }
+  }).listen(port, '127.0.0.1');
+
+  console.log('Serving your files at http://127.0.0.1:' + port + '/.');
+  return server;
+}
 
 /**
  * Function: recompileUponModification
@@ -79,32 +223,26 @@ module.exports = exports = function(env) {
  * that depend on this file.
  *
  * @param fileName - the name of the file
+ * @param extension - the extension of the file
  */
-function recompileUponModification(fileName, extension) {
-  fs.watchFile(fileName, {
-    persistent: true,
-    interval: 1500
-  }, function(curStat, oldStat) {
-    // watchFile fires callback on any stat changes; check specifically that
-    // the file has been modified
-    if (curStat.mtime > oldStat.mtime) {
-      q.ncall(fs.readFile, fs, fileName, 'utf8')
-        .then(function(contents) {
-          compileFns[fileName]();
+function recompileUponModification(fileName, extension, io) {
+  utils.watchFileForModification(fileName, 1000, function() {
+    q.ncall(fs.readFile, fs, fileName, 'utf8')
+      .then(function(contents) {
+        compileFns[fileName]();
 
-          // reset dependencies
-          clearDependencies(fileName);
-          recordDependencies(fileName, extension, contents);
+        // reset dependencies
+        clearDependencies(fileName);
+        recordDependencies(fileName, extension, contents);
 
-          // compile all files that depend on this one
-          for (var dependentFile in dependents[fileName]) {
-            console.log('Compiling dependent:', dependentFile);
-            if (compileFns[dependentFile]) {
-              compileFns[dependentFile]();
-            }
+        // compile all files that depend on this one
+        for (var dependentFile in dependents[fileName]) {
+          console.log('Compiling dependent:', dependentFile);
+          if (compileFns[dependentFile]) {
+            compileFns[dependentFile]();
           }
-        }).fail(utils.throwError);
-    }
+        }
+      }).fail(utils.throwError);
   });
 }
 
@@ -176,22 +314,29 @@ function recordDependencies(fileName, extension, contents) {
  *
  * @param fileNameSansExtension - file name without extension
  * @param extension - the extension of the file name
+ * @param live - true if this is live mode
  *
  * @return function to compile this file that takes no parameters
  */
-function generateCompileFn(fileNameSansExtension, extension) {
+function generateCompileFn(fileNameSansExtension, extension, live) {
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
     var contents = fs.readFileSync(fileName, 'utf8');
 
     switch (extension) {
       case 'jade':
+
         // run jade's render
         q.ncall(jade.render, jade, contents, {
           filename: fileName
         })
           .then(function(outputHTML) {
-            writeFile(fileNameSansExtension + '.html', outputHTML);
+            var compiledFileName = fileNameSansExtension + '.html';
+
+            utils.writeFile(compiledFileName, outputHTML)
+              .then(function() {
+                console.log('Compiled ' + compiledFileName + '.');
+              });
           }).fail(utils.throwError);
         break;
 
@@ -203,7 +348,11 @@ function generateCompileFn(fileNameSansExtension, extension) {
             compress: true
           })
             .then(function(outputCSS) {
-              writeFile(fileNameSansExtension + '.css', outputCSS);
+              var compiledFileName = fileNameSansExtension + '.css';
+              utils.writeFile(compiledFileName, outputCSS)
+                .then(function() {
+                  console.log('Compiled ' + compiledFileName + '.');
+                });
             }).fail(utils.throwError);
         break;
     }
@@ -216,45 +365,19 @@ function generateCompileFn(fileNameSansExtension, extension) {
  * Reads the current directory and promises a list of files along with their
  * contents.
  *
- * @param recursive - whether to read the current directory recursively
+ * @param recursive - true to read the current directory recursively
  * @return promise that yields an array of arrays in the form
  *  [ [file_name_1_without_extension, file_name_1_extension, contents_1],
  *  [file_name_2_without_extension, file_name_2_extension, contents_2], ... ].
  */
 function findFilesToCompile(recursive) {
-  var promise;
-
-  // normal or recursive directory reading
-  if (recursive) {
-    promise = utils.readDirRecursive('.');
-  } else {
-    promise = q.ncall(fs.readdir, {}, '.');
+  var rsFilter = '\\.(';
+  for(var extension in compiledExtensions) {
+    rsFilter += extension + '|';
   }
+  rsFilter = rsFilter.substr(0, rsFilter.length - 1) + ')$';
 
-  // go through each file/directory in the current directory
-  return promise
-    .then(function(dirList) {
-      var deferred = q.defer();
-      var files = [];
-      var numPaths = dirList.length;
-
-      // filter to only files
-      dirList.forEach(function(path, index) {
-        q.ncall(fs.stat, fs, path)
-          .then(function(stat) {
-            if (stat.isFile()) {
-              files.push(path);
-            }
-
-            // done? if so, resolve with the files
-            if (index == numPaths - 1) {
-              deferred.resolve(files);
-            }
-          }).fail(utils.throwError);
-      });
-
-      return deferred.promise;
-    })
+  return utils.readDirWithFilter('.', recursive, new RegExp(rsFilter), true)
     .then(function(files) {
       var deferred = q.defer();
 
@@ -265,19 +388,9 @@ function findFilesToCompile(recursive) {
       var numFiles = files.length;
 
       files.forEach(function(file, index) {
-        var extensionLoc = file.lastIndexOf('.');
-        var extension;
-
-        // don't try to compile files without extensions
-        if (extensionLoc === -1) {
-          return;
-        }
-
         // extract extension and contents of current file
-        extension = file.substr(extensionLoc + 1);
-        if (!(extension in compiledExtensions)) {
-          return;
-        }
+        var extensionLoc = file.lastIndexOf('.');
+        var extension = file.substr(extensionLoc + 1);
 
         q.ncall(fs.readFile, fs, file, 'utf8')
           .then(function(contents) {
@@ -293,21 +406,6 @@ function findFilesToCompile(recursive) {
 
       return deferred.promise;
     });
-}
-
-/**
- * Function: writeFile
- * -------------------
- * Writes the given file and contents.
- *
- * @param fileName - the file name to write to
- * @param contents - the contents of the file name
- */
-function writeFile(fileName, contents) {
-  q.ncall(fs.writeFile, fs, fileName, contents)
-    .then(function() {
-      console.log('Compiled ' + fileName + '.');
-    }).fail(utils.throwError);
 }
 
 /**
