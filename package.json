@@ -1,22 +1,24 @@
 {
-    "name": "nodefront",
-    "description": "A node-powered rapid front-end development utility",
-    "author": "Karthik Viswanathan <karthik.ksv@gmail.com>",
-    "version": "0.0.1",
-    "homepage": "",
-    "bin": {
-        "nodefront": "./bin/nodefront"
-    },
-    "engines": {
-        "node": ">=0.6.7"
-    },
-    "dependencies": {
-        "commander": "0.5.2",
-        "jade": "0.26.3",
-        "mime": "1.2.6",
-        "nconf": "0.6.0",
-        "q": "0.8.5",
-        "socket.io": "0.9.6",
-        "stylus": "0.27.2"
-    }
+  "name": "nodefront",
+  "description": "A node-powered rapid front-end development utility",
+  "author": "Karthik Viswanathan <karthik.ksv@gmail.com>",
+  "version": "0.0.1",
+  "homepage": "",
+  "bin": {
+    "nodefront": "./bin/nodefront"
+  },
+  "engines": {
+    "node": ">=0.6.7"
+  },
+  "dependencies": {
+    "adm-zip": "0.1.4", 
+    "commander": "0.5.2",
+    "jade": "0.26.3",
+    "mime": "1.2.6",
+    "nconf": "0.6.0",
+    "q": "0.8.5",
+    "request": "2.9.203",
+    "socket.io": "0.9.6",
+    "stylus": "0.27.2"
+  }
 }

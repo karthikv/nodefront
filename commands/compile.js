@@ -58,7 +58,6 @@ var rStylusInclude = /^[ \t]*@import[ \t]+([^\n]+)/gm;
 module.exports = exports = function(env) {
   var server;
   var io;
-  var localRootDir = pathLib.resolve('.');
 
   if (env.serve || env.live) {
     // serve the files on localhost
@@ -229,11 +228,15 @@ function recompileUponModification(fileName, extension, io) {
   utils.watchFileForModification(fileName, 1000, function() {
     q.ncall(fs.readFile, fs, fileName, 'utf8')
       .then(function(contents) {
-        compileFns[fileName]();
+        // this may be a static file that doesn't have a compile function, but
+        // is a dependency for some other compiled file
+        if (compileFns[fileName]) {
+          compileFns[fileName]();
 
-        // reset dependencies
-        clearDependencies(fileName);
-        recordDependencies(fileName, extension, contents);
+          // reset dependencies
+          clearDependencies(fileName);
+          recordDependencies(fileName, extension, contents);
+        }
 
         // compile all files that depend on this one
         for (var dependentFile in dependents[fileName]) {

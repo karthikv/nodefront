@@ -143,7 +143,7 @@ exports.readDirAbsolute = function(dir) {
  * @return promise that yields the given file's contents
  */
 exports.readFile = function(fileName) {
-  return q.ncall(fs.writeFile, fs, fileName, 'utf8')
+  return q.ncall(fs.readFile, fs, fileName, 'utf8')
     .fail(exports.throwError);
 };
 
@@ -183,6 +183,19 @@ exports.watchFileForModification = function(fileName, interval, callback) {
       callback(curStat, oldStat);
     }
   });
+};
+
+/**
+ * Function: getExtension
+ * ----------------------
+ * Returns the extension of the given file name or false if one doesn't exist.
+ */
+exports.getExtension = function(fileName) {
+  var dotIndex = fileName.lastIndexOf('.');
+
+  if (dotIndex === -1)
+    return false;
+  return fileName.substring(dotIndex + 1);
 };
 
 /**
