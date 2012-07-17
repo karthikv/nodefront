@@ -3,7 +3,7 @@ var q = require('q');
 var jade = require('jade');
 var stylus = require('stylus');
 var pathLib = require('path');
-var utils = require('../utils');
+var utils = require('../lib/utils');
 
 // files with these extensions need to be compiled
 var compiledExtensions = {
@@ -121,7 +121,7 @@ module.exports = exports = function(env) {
         }
       });
     })
-    .fail(utils.throwError);
+    .end();
 
   if (env.live) {
     // communicate to client whenever file is modified
@@ -203,7 +203,8 @@ function serveFilesLocally(port, live) {
         }, function(err) {
           response.writeHead(404, {'Content-Type': 'text/plain'});
           response.end('File not found.');
-        }).fail(utils.throwError);
+        })
+        .end();
     } else {
       // bad request error code
       response.writeHead(400, {'Content-Type': 'text/plain'});
@@ -245,7 +246,8 @@ function recompileUponModification(fileName, extension, io) {
             compileFns[dependentFile]();
           }
         }
-      }).fail(utils.throwError);
+      })
+      .end();
   });
 }
 
@@ -340,7 +342,8 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
               .then(function() {
                 console.log('Compiled ' + compiledFileName + '.');
               });
-          }).fail(utils.throwError);
+          })
+          .end();
         break;
 
       case 'styl':
@@ -356,7 +359,8 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
                 .then(function() {
                   console.log('Compiled ' + compiledFileName + '.');
                 });
-            }).fail(utils.throwError);
+            })
+            .end();
         break;
     }
   };
@@ -404,7 +408,8 @@ function findFilesToCompile(recursive) {
             if (index == numFiles - 1) {
               deferred.resolve(compileData);
             }
-          }).fail(utils.throwError);
+          })
+          .end();
       });
 
       return deferred.promise;

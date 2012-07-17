@@ -129,12 +129,12 @@ module.exports = exports = function(libraryName, env) {
  */
 function outputFileData(data, libraryName, fileName, dirName) {
   // append a slash to dirName if it doesn't already have one
-  if (dirName[dirName.length] !== '/') {
+  if (dirName && dirName[dirName.length] !== '/') {
     dirName += '/';
   }
 
   fs.writeFileSync(dirName + fileName, data);
-  console.log('Fetched ' + libraryName + ' into ' + dirName + fileName);
+  console.log('Fetched ' + libraryName + ' into ' + dirName + fileName + '.');
 }
 
 /**

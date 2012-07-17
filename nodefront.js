@@ -29,14 +29,14 @@ program
   .command('fetch <library>')
   .description('Fetches <library> for immediate use.')
   .option('-u, --url <url>', 'The URL to fetch the library from.')
-  .option('-p, --path <path>', 'Provides the path to the library in the' +
+  .option('-p, --path <pathRegex>', 'Provides the path to the library in the' +
           ' zip archive specified by the -u/--url <url> parameter. Note' +
-          ' that <path> should be a regular expression.')
+          ' that <pathRegex> should be a regular expression.')
   .option('-v, --version <version>', 'Specify the version of the library to' +
           ' fetch.', String, '')
   .option('-o, --output <directory>', 'If provided, the library will be' +
           ' stored as a file in the given directory. Otherwise, it will be' +
-          ' added to the current directory.', String, '.')
+          ' added to the current directory.', String, '')
   .option('-t, --type <type>', 'The type of this library, which should also' +
           'be its extension. This defaults to js.', String, 'js')
   .action(require('./commands/fetch'));
@@ -56,5 +56,24 @@ program
           ' are used, specify -1 for this option. Otherwise, if this is not' +
           ' given, the tab length is assumed to be 4.', Number, 4)
   .action(require('./commands/insert'));
+
+program
+  .command('minify <fileRegex>')
+  .description('Minifies all CSS/JS files that match the regular expression' +
+               ' <fileRegex>.')
+  .option('-r, --recursive', 'Minifies files that match <fileRegex> in' +
+          ' sub-directories. By default, only the current directory is' +
+          ' searched')
+  .option('-o, --out <file>', 'Stores the minified output in <file>. Include' +
+          ' {{ name }} in <file> and it will be replaced with the original' +
+          ' file name sans extension. Include {{ extension }} and it will be' +
+          " replaced by the original file's extension. By default, this is" +
+          " '{{ name }}.min.{{ extension }}'", String, '{{ name }}.min.' +
+          '{{ extension }}')
+  .option('-t, --type <type>', 'Files that match <fileRegex> will be treated' +
+          " as if they are of type <type>, where <type> is either 'js' or" +
+          " 'css'. The appropriate minifier will then be used. Normally," +
+          ' types are determined by the extension of files.')
+  .action(require('./commands/minify'));
 
 program.parse(process.argv);

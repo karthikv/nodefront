@@ -1,6 +1,6 @@
 var fs = require('fs');
 var pathLib = require('path');
-var utils = require('../utils');
+var utils = require('../lib/utils');
 
 // single line whitespace; does not include \n
 var rNotWhitespace = /[^ \t]/;
