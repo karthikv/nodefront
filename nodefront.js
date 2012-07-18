@@ -55,6 +55,7 @@ program
           ' each tab in the document for insertion purposes. If hard tabs' +
           ' are used, specify -1 for this option. Otherwise, if this is not' +
           ' given, the tab length is assumed to be 4.', Number, 4)
+  .option('-d, --delete', 'Delete <library> from <file>.')
   .action(require('./commands/insert'));
 
 // minify CSS/JS and optimize images

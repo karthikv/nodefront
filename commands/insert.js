@@ -55,16 +55,29 @@ module.exports = exports = function(libraryPath, filePath, env) {
       var newContents;
 
       if (fileExtension === 'jade') {
-        newContents = addLibraryToJade(path, contents, tab, env.head);
+        if (env.delete) {
+          newContents = deleteLibraryFromJade(path, contents);
+        } else {
+          newContents = addLibraryToJade(path, contents, tab, env.head);
+        }
       } else {
-        newContents = addLibraryToHTML(path, contents, tab, env.head);
+        if (env.delete) {
+          newContents = deleteLibraryFromHTML(path, contents);
+        } else {
+          newContents = addLibraryToHTML(path, contents, tab, env.head);
+        }
       }
 
       if (contents !== newContents) {
         utils.writeFile(filePath, newContents)
           .then(function() {
-            console.log('Added ' + libraryPath + ' to ' + filePath +
-                        ' successfully.');
+            if (env.delete) {
+              console.log('Deleted ' + libraryPath + ' from ' + filePath +
+                          ' successfully.');
+            } else {
+              console.log('Added ' + libraryPath + ' to ' + filePath +
+                          ' successfully.');
+            }
           });
     }
     })
@@ -151,6 +164,41 @@ function addLibraryToJade(path, jade, tab, jsToHead) {
 }
 
 /**
+ * Function: deleteLibraryFromJade
+ * -------------------------------
+ * Deletes the library, specified by path, from the provided Jade. If path ends
+ * in .css, a link tag will be removed from the Jade. Otherwise, if path ends
+ * in .js, a script tag will be removed.
+ * 
+ * @param path - the path to the library
+ * @param jade - the jade to remove the library from
+ */
+function deleteLibraryFromJade(path, jade) {
+  var libraryExtension = utils.getExtension(path);
+  var rsTag = '\n?'; // optional newline at the beginning
+
+  // original path is plain text; should be escaped
+  var escapedPath = utils.regExpEscape(path);
+
+  // determine what tag to delete via regex
+  if (libraryExtension === 'css') {
+    rsTag += '[ \t]*link\\([^\\)]*href=("|\')' + escapedPath +
+      '("|\')[^\\)]*\\)';
+  } else {
+    rsTag += '[ \t]*script\\([^\\)]*src=("|\')' + escapedPath +
+      '("|\')[^\\)]*\\)';
+  }
+
+  var rTag = new RegExp(rsTag);
+  if (!rTag.test(jade)) {
+    console.error('Could not find ' + path + ' in Jade to delete it.');
+    return jade;
+  }
+
+  return jade.replace(rTag, '');
+}
+
+/**
  * Function: addLibraryToHTML
  * --------------------------
  * Adds the given library path to the provided Jade. If the path ends in .css
@@ -203,4 +251,40 @@ function addLibraryToHTML(path, html, tab, jsToHead) {
       return tab + tag + '\n' + fullMatch;
     }
   });
+}
+
+/**
+ * Function: deleteLibraryFromHTML
+ * -------------------------------
+ * Deletes the library, specified by path, from the HTML. If path ends in .css,
+ * a link tag will be removed from the HTML. Otherwise, if path ends in .js,
+ * a script tag will be removed.
+ * 
+ * @param path - the path to the library
+ * @param html - the HTML to remove the library from
+ */
+function deleteLibraryFromHTML(path, html) {
+  var libraryExtension = utils.getExtension(path);
+  var rsTag;
+
+  // original path is plain text; should be escaped
+  var escapedPath = utils.regExpEscape(path);
+
+  // determine what tag to delete via regex
+  if (libraryExtension === 'css') {
+    rsTag = '[ \t]*<link [^>]*href=("|\')' + escapedPath + '("|\')[^>]*>' +
+      '(</link>)?';
+  } else {
+    rsTag = '[ \t]*<script [^>]*src=("|\')' + escapedPath + '("|\')[^>]*>' +
+      '(</script>)?';
+  }
+  rsTag += '\n?'; // optional newline at the end
+
+  var rTag = new RegExp(rsTag);
+  if (!rTag.test(html)) {
+    console.error('Could not find ' + path + ' in HTML to delete it.');
+    return html;
+  }
+
+  return html.replace(rTag, '');
 }
