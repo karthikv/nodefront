@@ -57,10 +57,11 @@ program
           ' given, the tab length is assumed to be 4.', Number, 4)
   .action(require('./commands/insert'));
 
+// minify CSS/JS and optimize images
 program
-  .command('minify <fileRegex>')
+  .command('minify [fileRegex]')
   .description('Minifies all CSS/JS files that match the regular expression' +
-               ' <fileRegex>.')
+               ' <fileRegex>. Can also optimize PNG/JPEG images.')
   .option('-r, --recursive', 'Minifies files that match <fileRegex> in' +
           ' sub-directories. By default, only the current directory is' +
           ' searched')
@@ -70,10 +71,16 @@ program
           " replaced by the original file's extension. By default, this is" +
           " '{{ name }}.min.{{ extension }}'", String, '{{ name }}.min.' +
           '{{ extension }}')
+  .option('-w, --overwrite', 'Shortcut for -o {{ name }}.{{ extension }}.' +
+          ' Overwrites the files that match <fileRegex> with their minified' +
+          ' versions.')
   .option('-t, --type <type>', 'Files that match <fileRegex> will be treated' +
-          " as if they are of type <type>, where <type> is either 'js' or" +
-          " 'css'. The appropriate minifier will then be used. Normally," +
-          ' types are determined by the extension of files.')
+          " as if they are of type <type>, where <type> is 'js', 'css'," +
+          " 'jpg', 'jpeg', or 'png'. The appropriate minifier will then be" +
+          ' used. Normally, types are determined by the extension of files.')
+  .option('-c, --css', 'Shortcut to minify all CSS files.')
+  .option('-j, --js', 'Shortcut to minify all JS files.')
+  .option('-i, --images', 'Shortcut to optimize all JPEG/PNG files.')
   .action(require('./commands/minify'));
 
 program.parse(process.argv);
