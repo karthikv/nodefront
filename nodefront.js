@@ -84,6 +84,8 @@ program
   .option('-c, --css', 'Shortcut to minify all CSS files.')
   .option('-j, --js', 'Shortcut to minify all JS files.')
   .option('-i, --images', 'Shortcut to optimize all JPEG/PNG files.')
+  .option('-p, --plain', 'Switch to plain text mode, where [fileRegex] is no' +
+          ' longer a regular expression, but just the path to a file.')
   .action(require('./commands/minify'));
 
 program.parse(process.argv);

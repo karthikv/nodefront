@@ -51,5 +51,12 @@
     "path": "chosen/chosen\\.jquery\\.js",
     "latest": "0.9.8",
     "minify": true
+  },
+  "angular": {
+    "type": "js",
+    "url": "https://github.com/angular/angular.js/zipball/v{{ version }}",
+    "path": "src/Angular\\.js",
+    "latest": "1.0.1",
+    "minify": true
   }
 }

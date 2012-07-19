@@ -41,6 +41,11 @@ var allowedExtensions = {
  *  Note that this determines which minifier/optimizer is used.
  */
 module.exports = exports = function(rsFilter, env) {
+  if (env.plain && rsFilter) {
+    rsFilter = utils.regExpEscape(rsFilter);
+    rsFilter = rsFilter + '$';
+  }
+
   var types = [];
 
   // collect all shortcut types into one array
