@@ -2,7 +2,13 @@ var fs = require('fs');
 var request = require('request');
 var libraries = require('nconf');
 var q = require('q');
+var program = require('commander');
 var Zip = require('adm-zip');
+var minifyCommand = require('./minify');
+var utils = require('../lib/utils');
+
+// add promise variants of program functions using q
+utils.qifyProgram(program);
 
 // json configuration file for standard libraries
 libraries.file({ file: __dirname + '/../libraries.json' });
@@ -35,10 +41,20 @@ libraries.file({ file: __dirname + '/../libraries.json' });
  *  be <libraryName>-<version>.<type>. Defaults to js.
  */
 module.exports = exports = function(libraryName, env) {
+  if (env.interactive) {
+    runInteractiveSession(libraryName, env);
+
+    // runInteractiveSession will call this function again without interactive
+    // mode enabled and with the interactive inputs
+    return;
+  }
+
   var url = env.url;
   var path = env.path;
   var version = env.version;
+  var latest = env.latest;
   var type = env.type;
+  var minify = env.minify;
 
   // normalize library names to lowercase
   libraryName = libraryName.toLowerCase();
@@ -54,17 +70,35 @@ module.exports = exports = function(libraryName, env) {
 
     url = library.url;
     path = library.path;
-
     type = library.type || 'js';
+
     if (!version) {
       // if no version was specified, assume the user wants the latest
       version = library.latest;
     }
-
-    url = url.replace('{{ version }}', version);
+    if (!minify) {
+      minify = library.minify;
+    }
+  } else {
+    // if library information is given, save it for future use
+    libraries.set(libraryName, {
+      type: type,
+      url: url,
+      path: path,
+      latest: latest || version,
+      minify: minify
+    });
+    
+    libraries.save(function(err) {
+      if (err) {
+        console.error('Could not save the library configuration to disk.');
+      }
+    });
   }
 
+  url = url.replace(/\{\{\s*version\s*\}\}/, version);
   var fileName;
+
   if (version) {
     fileName = libraryName + '-' + version + '.' + type;
   } else {
@@ -79,10 +113,18 @@ module.exports = exports = function(libraryName, env) {
     downloadFile(url, toFileName)
       .then(function() {
         var pathRegex = new RegExp(path);
-        var zip = new Zip(toFileName);
-
-        var entries = zip.getEntries();
+        var zip;
+        var entries;
         var foundPath = false;
+
+        try {
+          zip = new Zip(toFileName);
+          entries = zip.getEntries();
+        } catch (error) {
+          // error thrown is not an error object and q can't handle that well;
+          // convert it here
+          throw new Error(error);
+        }
 
         // find the path that matches the regular expression
         for (var i = 0; i < entries.length; i++) {
@@ -90,9 +132,12 @@ module.exports = exports = function(libraryName, env) {
             foundPath = true;
             console.log('Matched path ' + entries[i].entryName);
 
-            // output it
             outputFileData(zip.readAsText(entries[i]), libraryName, fileName,
               dirName);
+
+            if (minify) {
+              minifyCommand(utils.regExpEscape(fileName), { overwrite: true });
+            }
             break;
           }
         }
@@ -111,10 +156,138 @@ module.exports = exports = function(libraryName, env) {
     downloadFile(url)
       .then(function(data) {
         outputFileData(data, libraryName, fileName, dirName);
+
+        if (minify) {
+          minifyCommand(utils.regExpEscape(fileName), { overwrite: true });
+        }
       })
       .end();
   }
 };
+
+/**
+ * Function: runInteractiveSession
+ * -------------------------------
+ * Runs an interactive session to fetch a library, querying the user for
+ * a name, URL, path, etc.
+ *
+ * @param libraryName - the name of the library or undefined if not provided
+ * @param env - the command-line environment
+ */
+function runInteractiveSession(libraryName, env) {
+  console.log('To begin, please enter the name of the library you would\n' +
+              'like to fetch. You will use this name to access the\n' +
+              'library in the future and it will also be used to name the\n' +
+              'fetched file.\n');
+
+  program.qPromptDefault('Library name', libraryName)
+    .then(function(name) {
+      libraryName = name;
+
+      console.log('\nWhat URL can this library be accessed at? You may\n' +
+                  'specify either a direct link or a link to a zip file\n' +
+                  'containing the library you are looking for.\n');
+      console.log('For added flexibility in your library choice, you may\n' +
+                  'include {{ version }} in your URL. This will be\n' +
+                  'replaced by the version number being requested via\n' +
+                  'the -v/--version parameter. This implies that you\n' +
+                  'must find a flexible URL. If you cannot, that\'s fine;\n' +
+                  'this feature is completely optional.\n');
+
+      return program.qPromptDefault('URL', env.url);
+    })
+    .then(function(url) {
+      env.url = url;
+
+      console.log("\nWhat type of library is this (enter 'css' for CSS and\n" +
+                  "'js'for JavaScript).\n");
+      return program.qPromptDefault('Library type', env.type);
+    })
+    .then(function(type) {
+      env.type = type;
+
+      console.log('\nPlease enter in the latest version of this library:\n');
+      return program.qPromptDefault('Latest version', env.latest ||
+        env.version);
+    })
+    .then(function(latest) {
+      env.latest = latest;
+
+      console.log('\nIf you would like to fetch a version different from\n' +
+                  'the one you just entered, please enter that here:\n');
+      return program.qPromptDefault('Version', env.version || env.latest);
+    })
+    .then(function(version) {
+      env.version = version;
+
+      console.log('\nDoes the URL you entered earlier point to a zip\n' +
+                  'archive?');
+      return program.qConfirm('\nZip archive? ');
+    })
+    .then(function(isZip) {
+      if (isZip) {
+        var url = env.url.replace(/\{\{\s*version\s*\}\}/, env.version);
+        console.log('\nYou will now need to select which file in the zip\n' +
+                    'archive is the library you are looking for. Please\n' +
+                    'choose from the list below.\n');
+
+        return downloadFile(url, 'nodefront-' + libraryName + '-zip')
+          .then(function(toFileName) {
+            var zip;
+            var entries;
+
+            try {
+              zip = new Zip(toFileName);
+              entries = zip.getEntries();
+            } catch (error) {
+              // error thrown is not an error object and q can't handle that well;
+              // convert it here
+              throw new Error(error);
+            }
+
+            fs.unlinkSync(toFileName);
+            return entries.map(function(entry) {
+              return entry.entryName;
+            });
+          })
+          .then(function(entries) {
+            return program.qChoose(entries)
+              .then(function(index) {
+                return entries[index];
+              });
+          });
+      }
+    })
+    .then(function(path) {
+      if (path) {
+        // first part of the path is usually a variable/unknown directory name,
+        // so strip it to ensure the library can always be found
+        var firstSlash = path.indexOf('/');
+        if (firstSlash !== -1) {
+          path = path.substring(firstSlash + 1);
+        }
+        env.path = utils.regExpEscape(path);
+      }
+
+      console.log('\nWould you like the library to be minified upon ' +
+                  'download?');
+      return program.qConfirm('\nMinify the library? ');
+    })
+    .then(function(minify) {
+      if (minify) {
+        env.minify = minify;
+      }
+
+      console.log('\nAnd that\'s it! Your library will be fetched\n' +
+                  'shortly.\n');
+      delete env.interactive;
+
+      // call fetch with the updated environment from interactive user input
+      exports(libraryName, env);
+      process.stdin.destroy();
+    })
+    .end();
+}
 
 /**
  * Function: outputFileData

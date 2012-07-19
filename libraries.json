@@ -3,47 +3,53 @@
     "latest": "1.7.2",
     "url": "https://ajax.googleapis.com/ajax/libs/jquery/{{ version }}/jquery.min.js"
   },
-
   "mootools": {
     "latest": "1.4.5",
     "url": "https://ajax.googleapis.com/ajax/libs/mootools/{{ version }}/mootools-yui-compressed.js"
   },
-
   "dojo": {
     "latest": "1.7.3",
     "url": "https://ajax.googleapis.com/ajax/libs/dojo/{{ version }}/dojo/dojo.js"
   },
-
   "jqueryui": {
     "latest": "1.8.21",
     "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/{{ version }}/jquery-ui.min.js"
   },
-
   "prototype": {
     "latest": "1.7.1.0",
     "url": "https://ajax.googleapis.com/ajax/libs/prototype/{{ version }}/prototype.js"
   },
-
   "script.aculo.us": {
     "latest": "1.9.0",
     "url": "https://ajax.googleapis.com/ajax/libs/scriptaculous/{{ version }}/scriptaculous.js"
   },
-
   "ext-core": {
     "latest": "3.1.0",
     "version": "https://ajax.googleapis.com/ajax/libs/ext-core/{{ version }}/ext-core.js"
   },
-
   "backbone": {
     "latest": "0.9.1",
     "url": "https://github.com/documentcloud/backbone/zipball/{{ version }}",
     "path": "backbone-min\\.js"
   },
-
   "bootstrap": {
     "type": "css",
-    "latest": "2.0.4",
     "url": "https://github.com/twitter/bootstrap/zipball/v{{ version }}",
-    "path": "bootstrap.css"
+    "path": "bootstrap.css",
+    "latest": "2.0.4",
+    "minify": true
+  },
+  "zepto": {
+    "type": "js",
+    "url": "https://github.com/madrobby/zepto/zipball/master",
+    "path": "src/zepto",
+    "latest": ""
+  },
+  "chosen": {
+    "type": "js",
+    "url": "https://github.com/harvesthq/chosen/zipball/v{{ version }}",
+    "path": "chosen/chosen\\.jquery\\.js",
+    "latest": "0.9.8",
+    "minify": true
   }
 }

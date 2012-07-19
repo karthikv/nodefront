@@ -26,7 +26,7 @@ program
 
 // fetch libraries
 program
-  .command('fetch <library>')
+  .command('fetch [library]')
   .description('Fetches <library> for immediate use.')
   .option('-u, --url <url>', 'The URL to fetch the library from.')
   .option('-p, --path <pathRegex>', 'Provides the path to the library in the' +
@@ -39,6 +39,8 @@ program
           ' added to the current directory.', String, '')
   .option('-t, --type <type>', 'The type of this library, which should also' +
           'be its extension. This defaults to js.', String, 'js')
+  .option('-m, --minify', 'Minify the fetched file.')
+  .option('-i, --interactive', 'Interactively add a new library and fetch it.')
   .action(require('./commands/fetch'));
 
 // insert CSS/JS libraries into HTML/Jade documents
