@@ -3,9 +3,9 @@
   "description": "A node-powered rapid front-end development utility",
   "author": "Karthik Viswanathan <karthik.ksv@gmail.com>",
   "version": "0.0.1",
-  "homepage": "",
+  "homepage": "http://karthikv.github.com/nodefront/",
   "bin": {
-    "nodefront": "./bin/nodefront"
+    "nodefront": "./nodefront.js"
   },
   "engines": {
     "node": ">=0.6.7"
