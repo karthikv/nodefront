@@ -116,7 +116,7 @@ module.exports = exports = function(rsFilter, env) {
           // replace {{ name }} and {{ extension }} with their respective values
           toFileName = env.out;
           toFileName = toFileName.replace(/\{\{\s*name\s*\}\}/,
-            fileNameSansExtension);
+            pathLib.basename(fileNameSansExtension));
           toFileName = toFileName.replace(/\{\{\s*extension\s*\}\}/, extension);
         }
 
