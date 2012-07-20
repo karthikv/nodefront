@@ -64,7 +64,8 @@ module.exports = exports = function(libraryName, env) {
     var library = libraries.get(libraryName);
     if (!library) {
       console.error('Could not find library ' + libraryName + '. Please' +
-        ' specify a URL via the -u/--url parameter.');
+                    ' specify a URL via the -u/--url parameter or jump into' +
+                    ' the interactive mode with -i/--interactive.');
       return;
     }
 
