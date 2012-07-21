@@ -1,0 +1,5 @@
+.DS_Store
+*.sw[pon]
+node_modules
+.git*
+test/

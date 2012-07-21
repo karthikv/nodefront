@@ -4,15 +4,19 @@ To see a styled version of the documentation below, please visit [nodefront's we
 
 ## Overview
 
-Nodefront is a node-powered command-line utility that speeds up front-end development.
+Nodefront is a node.js-powered command-line utility that speeds up front-end development.
 
 ## Installation
 
 Installation is simple with npm:
 
 ```bash
-npm install -g nodefront
+$ npm install -g nodefront
 ```
+
+## Introductory Screencast
+
+Before diving into the documentation, you may view a [screencast that introduces some of nodefront's key features on Vimeo](https://vimeo.com/46197434).
 
 ## Command Summary
 
@@ -212,6 +216,46 @@ JS: `nodefront minify -j/-js` will minify all JS files in the current directory.
 
 Images: `nodefront minify --i/--images` will minify all JPEG and PNG images in the current directory. This is a shortcut to `nodefront minify \.(jpg|jpeg|png)$`.
 
-Note that the last three options can be mix and matched as necessary to, for example, minify all CSS and JS, but no images.
+Note that the last three options can be mix and matched as necessary to, for example, minify all CSS and JS, but no images, like so:
 
-If you have any questions, comments, concerns, or suggestions, please feel free to create a new issue on [GitHub](https://github.com/karthikv/nodefront/issues) or contact me via email at me [at] karthikv [dot] net.
+```bash
+$ nodefront minify -cj
+```
+
+## Contributors
+### Karthik Viswanathan
+- GitHub: [@karthikv](https://github.com/karthikv)
+- Twitter: [@karthikvnet](https://twitter.com/karthikvnet)
+- Website: [http://karthikv.net](http://karthikv.net)
+- Email: me@karthikv.net
+
+## Questions?
+If you have any questions, comments, concerns, or suggestions, please feel free to create a new issue on [GitHub](https://github.com/karthikv/nodefront/issues) or contact Karthik directly (see contributors section above).
+
+## Inspiration
+- [Volo](https://github.com/volojs/volo) - "A JavaScript dependency manager and project creation tool that favors GitHub for the package repository."
+- [Yeoman](http://yeoman.io/) - "A robust and opinionated client-side stack, comprised of tools and frameworks that can help developers quickly build beautiful web applications."
+
+## License
+(The MIT License)
+
+Copyright (c) 2012 Karthik Viswanathan &lt;me@karthikv.net&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
