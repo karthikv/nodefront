@@ -25,7 +25,7 @@
   },
   "ext-core": {
     "latest": "3.1.0",
-    "version": "https://ajax.googleapis.com/ajax/libs/ext-core/{{ version }}/ext-core.js"
+    "url": "https://ajax.googleapis.com/ajax/libs/ext-core/{{ version }}/ext-core.js"
   },
   "backbone": {
     "latest": "0.9.1",

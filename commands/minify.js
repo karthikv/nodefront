@@ -1,5 +1,6 @@
 var fs = require('fs');
 var pathLib = require('path');
+var q = require('q');
 var utils = require('../lib/utils');
 var parser = require('uglify-js').parser;
 var uglify = require('uglify-js').uglify;
@@ -39,8 +40,10 @@ var allowedExtensions = {
  *  incorrect extension, this parameter may be used. Use "css" for CSS files,
  *  "js" for JS files, "jpg" or "jpeg" for JPEG files, and "png" for PNG files.
  *  Note that this determines which minifier/optimizer is used.
+ *
+ * @param shouldPromise - if true, returns a promise that yields completion
  */
-module.exports = exports = function(rsFilter, env) {
+module.exports = exports = function(rsFilter, env, shouldPromise) {
   if (env.plain && rsFilter) {
     rsFilter = utils.regExpEscape(rsFilter);
     rsFilter = rsFilter + '$';
@@ -73,9 +76,9 @@ module.exports = exports = function(rsFilter, env) {
   }
 
   var rFilter = new RegExp(rsFilter);
-  utils.readDirWithFilter('.', env.recursive, rFilter, true)
+  var promise = utils.readDirWithFilter('.', env.recursive, rFilter, true)
     .then(function(files) {
-      files.forEach(function(fileName) {
+      return q.all(files.map(function(fileName) {
         // skip dot files
         if (pathLib.basename(fileName)[0] === '.') {
           return;
@@ -120,10 +123,16 @@ module.exports = exports = function(rsFilter, env) {
           toFileName = toFileName.replace(/\{\{\s*extension\s*\}\}/, extension);
         }
 
-        minify(fileName, toFileName, extension);
-      });
-    })
-    .end();
+        // return a promise for q.all
+        return minify(fileName, toFileName, extension);
+      }));
+    });
+
+  if (shouldPromise) {
+    return promise;
+  } else {
+    promise.end();
+  }
 };
 
 /**
@@ -138,8 +147,11 @@ module.exports = exports = function(rsFilter, env) {
  * @param toFileName - the name of the file to store the minified contents into
  * @param type - the type of the file used to determine what
  *  minification/optimization should be used.
+ *
+ * @return promise that yields completion
  */
 function minify(fileName, toFileName, type) {
+  var deferred = q.defer();
   var relativeFileName = pathLib.relative('.', fileName);
   var relativeToFileName = pathLib.relative('.', toFileName);
 
@@ -156,11 +168,12 @@ function minify(fileName, toFileName, type) {
    */
   function imageExecCallback(error, stdout, stderr) {
     if (error) {
-      throw error;
+      deferred.resolve(error);
+    } else {
+      console.log('Optimized ' + relativeFileName + ' to ' +
+                  relativeToFileName + '.');
+      deferred.resolve();
     }
-
-    console.log('Optimized ' + relativeFileName + ' to ' +
-                relativeToFileName + '.');
   }
 
   if (type === 'png') {
@@ -202,8 +215,11 @@ function minify(fileName, toFileName, type) {
           .then(function() {
             console.log('Minified ' + relativeFileName + ' to ' +
                         relativeToFileName + '.');
+            deferred.resolve();
           });
       })
       .end();
   }
+
+  return deferred.promise;
 }

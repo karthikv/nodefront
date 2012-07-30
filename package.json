@@ -12,12 +12,15 @@
   },
   "dependencies": {
     "adm-zip": "0.1.4", 
-    "commander": "0.5.2",
+    "commander": "1.0.0",
     "jade": "0.26.3",
     "mime": "1.2.6",
+    "mocha": "1.3.0",
+    "mockery": "1.1.2",
     "nconf": "0.6.0",
     "q": "0.8.5",
     "request": "2.9.203",
+    "should": "1.0.0",
     "socket.io": "0.9.6",
     "stylus": "0.27.2",
     "uglify-js": "1.3.2"

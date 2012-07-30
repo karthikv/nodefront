@@ -39,8 +39,12 @@ libraries.file({ file: __dirname + '/../libraries.json' });
  *  If the -t/--type <type> parameter is specified, the extension of the
  *  library will be <type>. Note that the format of the library file name will
  *  be <libraryName>-<version>.<type>. Defaults to js.
+ *
+ * @param shouldPromise - if true, returns a promise that yields completion
+ * @param omitSave - if true, omit saving the configuration for this library
  */
-module.exports = exports = function(libraryName, env) {
+module.exports = exports = function(libraryName, env, shouldPromise,
+  omitSave) {
   if (env.interactive) {
     runInteractiveSession(libraryName, env);
 
@@ -90,11 +94,13 @@ module.exports = exports = function(libraryName, env) {
       minify: minify
     });
     
-    libraries.save(function(err) {
-      if (err) {
-        console.error('Could not save the library configuration to disk.');
-      }
-    });
+    if (!omitSave) {
+      libraries.save(function(err) {
+        if (err) {
+          console.error('Could not save the library configuration to disk.');
+        }
+      });
+    }
   }
 
   url = url.replace(/\{\{\s*version\s*\}\}/, version);
@@ -107,11 +113,13 @@ module.exports = exports = function(libraryName, env) {
   }
 
   var dirName = env.output;
+  var promise;
+
   if (url && path) {
     // download the zip archive to a temporary file
     var toFileName = 'nodefront-' + libraryName + '-tmp';
 
-    downloadFile(url, toFileName)
+    promise = downloadFile(url, toFileName)
       .then(function() {
         var pathRegex = new RegExp(path);
         var zip;
@@ -137,7 +145,13 @@ module.exports = exports = function(libraryName, env) {
               dirName);
 
             if (minify) {
-              minifyCommand(utils.regExpEscape(fileName), { overwrite: true });
+              if (dirName) {
+                // switch to output dir where the file to minify is located
+                process.chdir(dirName);
+              }
+
+              return minifyCommand(utils.regExpEscape(fileName),
+                { overwrite: true }, true);
             }
             break;
           }
@@ -150,19 +164,29 @@ module.exports = exports = function(libraryName, env) {
       .fin(function() {
         // delete the temporary file
         fs.unlinkSync(toFileName);
-      })
-      .end();
+      });
   } else if (url) {
     // download the file at the URL and output it
-    downloadFile(url)
+    promise = downloadFile(url)
       .then(function(data) {
         outputFileData(data, libraryName, fileName, dirName);
 
-        if (minify) {
-          minifyCommand(utils.regExpEscape(fileName), { overwrite: true });
+        if (dirName) {
+          // switch to output dir where the file to minify is located
+          process.chdir(dirName);
         }
-      })
-      .end();
+
+        if (minify) {
+          return minifyCommand(utils.regExpEscape(fileName),
+            { overwrite: true }, true);
+        }
+      });
+  }
+
+  if (shouldPromise) {
+    return promise;
+  } else {
+    promise.end();
   }
 };
 
