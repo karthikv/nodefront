@@ -1,11 +1,10 @@
 var fs = require('fs');
-var exec = require('child_process').exec;
 var urlLib = require('url');
 var q = require('q');
 var should = require('should');
-var mockery = require('mockery');
 var utils = require('../lib/utils');
 var libraries = require('../libraries.json');
+var sandboxedModule = require('sandboxed-module');
 
 var nodefront = __dirname + '/../nodefront.js';
 var outputDir = __dirname + '/resources/fetch/output';
@@ -14,37 +13,15 @@ var expectedDir = __dirname + '/resources/fetch/expected';
 // mock out UglifyJS minification to quicken this test
 var uglifyJSMock = {
   parser: {
-    parse: function() {
-      return 'parsed';
-    }
+    parse: function() {}
   },
 
   uglify: {
-    ast_mangle: function(ast) {
-      if (ast === 'parsed') {
-        return 'mangled';
-      } else {
-        // must be called after parse
-        throw new Error('UglifyJS ast_mangle not called in order');
-      }
-    },
-
-    ast_squeeze: function(ast) {
-      if (ast === 'mangled') {
-        return 'squeezed';
-      } else {
-        // must be called after ast_mangle
-        throw new Error('UglifyJS ast_squeeze not called in order');
-      }
-    },
+    ast_mangle: function(ast) {},
+    ast_squeeze: function(ast) {},
 
     gen_code: function(ast) {
-      if (ast === 'squeezed') {
-        return this.minifiedCode;
-      } else {
-        // must be called after ast_squeeze
-        throw new Error('UglifyJS gen_code not called in order');
-      }
+      return this.minifiedCode;
     },
 
     // set the expected minified code to be returned
@@ -56,7 +33,7 @@ var uglifyJSMock = {
 
 // mock out HTTP requests
 var mockResponses = {};
-var request = function(url, callback) {
+var requestMock = function(url, callback) {
   if (callback) {
     // call callback with mock response
     callback(null, { statusCode: 200 }, mockResponses[url]);
@@ -83,12 +60,16 @@ var request = function(url, callback) {
   }
 };
 
-mockery.enable();
-mockery.registerMock('uglify-js', uglifyJSMock);
-mockery.registerMock('request', request);
-mockery.warnOnUnregistered(false);
-
-var fetch = require('../commands/fetch');
+var fetch = sandboxedModule.require('../commands/fetch', {
+  requires: {
+    './minify': sandboxedModule.require('../commands/minify', {
+      requires: {
+        'uglify-js': uglifyJSMock
+      }
+    }),
+    request: requestMock
+  }
+});
 var defaultEnv = { version: '', output: outputDir, type: 'js' };
 
 describe('nodefront fetch', function() {
@@ -148,9 +129,6 @@ describe('nodefront fetch', function() {
       })
       .then(function() {
         return confirmFetch(libraryName, expected, version);
-      })
-      .fin(function() {
-        mockery.disable();
       })
       .then(done)
       .end();

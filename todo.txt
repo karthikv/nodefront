@@ -1,0 +1,8 @@
+----------------------
+| - Task             |
+| ~ Task in progress |
+| / Completed task   |
+----------------------
+
+- Make minification for subdirectory more intuitive; i.e. running nodefront
+  minify images/book.jpg doesn't work unless the -r/--recursive options is on

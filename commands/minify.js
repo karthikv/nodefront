@@ -75,6 +75,14 @@ module.exports = exports = function(rsFilter, env, shouldPromise) {
     return;
   }
 
+  if (rsFilter.indexOf('/') !== -1 && !env.recursive) {
+    // if a slash is present in the fileRegex, it is likely that the user wants
+    // to minify a file in another directory, so add in the recursive option
+    console.log('Automatically adding recursive option because file target' +
+                ' looks to be in another directory.');
+    env.recursive = true;
+  }
+
   var rFilter = new RegExp(rsFilter);
   var promise = utils.readDirWithFilter('.', env.recursive, rFilter, true)
     .then(function(files) {
@@ -121,6 +129,9 @@ module.exports = exports = function(rsFilter, env, shouldPromise) {
           toFileName = toFileName.replace(/\{\{\s*name\s*\}\}/,
             pathLib.basename(fileNameSansExtension));
           toFileName = toFileName.replace(/\{\{\s*extension\s*\}\}/, extension);
+
+          // toFileName should be in same directory as fileName
+          toFileName = pathLib.dirname(fileName) + '/' + toFileName;
         }
 
         // return a promise for q.all

@@ -145,14 +145,9 @@ module.exports = exports = function(libraryName, env, shouldPromise,
               dirName);
 
             if (minify) {
-              if (dirName) {
-                // switch to output dir where the file to minify is located
-                process.chdir(dirName);
-              }
-
-              return minifyCommand(utils.regExpEscape(fileName),
-                { overwrite: true }, true);
+              return minifyFetchedFile(dirName, fileName);
             }
+
             break;
           }
         }
@@ -169,16 +164,11 @@ module.exports = exports = function(libraryName, env, shouldPromise,
     // download the file at the URL and output it
     promise = downloadFile(url)
       .then(function(data) {
+        var originalDir;
         outputFileData(data, libraryName, fileName, dirName);
 
-        if (dirName) {
-          // switch to output dir where the file to minify is located
-          process.chdir(dirName);
-        }
-
         if (minify) {
-          return minifyCommand(utils.regExpEscape(fileName),
-            { overwrite: true }, true);
+          return minifyFetchedFile(dirName, fileName);
         }
       });
   }
@@ -312,6 +302,31 @@ function runInteractiveSession(libraryName, env) {
       process.stdin.destroy();
     })
     .end();
+}
+
+/**
+ * Function: minifyFetchedFile
+ * ---------------------------
+ * Minifies a fetched file given the directory it is in and its name.
+ *
+ * @param dirName - the directory the fetched file is in
+ * @param fileName - the name of the fetched file
+ */
+function minifyFetchedFile(dirName, fileName) {
+  var originalDir;
+
+  if (dirName) {
+    originalDir = process.cwd();
+    // switch to output dir where the file to minify is located
+    process.chdir(dirName);
+  }
+
+  return minifyCommand(utils.regExpEscape(fileName),
+    { overwrite: true }, true)
+    .then(function() {
+      // switch back to original dir
+      process.chdir(originalDir);
+    });
 }
 
 /**
