@@ -8,7 +8,7 @@ var expectedDir = __dirname + '/resources/insert/expected';
 var insert = require('../commands/insert');
 var defaultEnv = { tabLength: 4 };
 
-describe('nodefront insert', function() {
+describe('`nodefront insert`', function() {
   it('inserts JavaScript files into HTML footer', function(done) {
     insert(inputDir + '/jquery-1.7.2.js', inputDir + '/document.html',
       defaultEnv, true)

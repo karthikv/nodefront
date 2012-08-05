@@ -40,11 +40,11 @@ libraries.file({ file: __dirname + '/../libraries.json' });
  *  library will be <type>. Note that the format of the library file name will
  *  be <libraryName>-<version>.<type>. Defaults to js.
  *
- * @param shouldPromise - if true, returns a promise that yields completion
  * @param omitSave - if true, omit saving the configuration for this library
+ * @param shouldPromise - if true, returns a promise that yields completion
  */
-module.exports = exports = function(libraryName, env, shouldPromise,
-  omitSave) {
+module.exports = exports = function(libraryName, env, omitSave,
+    shouldPromise) {
   if (env.interactive) {
     runInteractiveSession(libraryName, env);
 

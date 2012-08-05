@@ -10,4 +10,7 @@ test-minify:
 test-insert:
 	@./node_modules/.bin/mocha test/test.insert.js --reporter list
 
+test-compile:
+	@./node_modules/.bin/mocha test/test.compile.js --reporter list
+
 .PHONY: test

@@ -70,7 +70,7 @@ var minify = sandboxedModule.require('../commands/minify', {
 var defaultEnv = { out: '{{ name }}.min.{{ extension }}' };
 var originalDir = process.cwd();
 
-describe('nodefront minify', function() {
+describe('`nodefront minify`', function() {
   before(function() {
     process.chdir(inputDir);
   });

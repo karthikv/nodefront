@@ -54,8 +54,10 @@ var rStylusInclude = /^[ \t]*@import[ \t]+([^\n]+)/gm;
  *  Stylus files are altered. In the case of CSS/Stylus, link tags on the page
  *  are simply removed and re-added. For HTML/JS/Jade, the browser is refreshed
  *  entirely.
+ *  
+ * @param shouldPromise - if true, returns a promise that yields completion
  */
-module.exports = exports = function(env) {
+module.exports = exports = function(env, shouldPromise) {
   var server;
   var io;
 
@@ -97,8 +99,10 @@ module.exports = exports = function(env) {
     });
   }
 
-  findFilesToCompile(env.recursive)
+  var promise = findFilesToCompile(env.recursive)
     .then(function(compileData) {
+      var promises = [];
+
       // process each file to compile
       compileData.forEach(function(compileDatum) {
         // compileDatum is in the form [file_name_without_extension, extension,
@@ -112,7 +116,7 @@ module.exports = exports = function(env) {
         var compileFn = generateCompileFn(fileNameSansExtension, extension,
             contents, env.live);
         compileFns[fileName] = compileFn;
-        compileFn();
+        promises.push(compileFn());
 
         if (env.watch || env.live) {
           // record dependencies for dependency-intelligent recompilation
@@ -120,8 +124,15 @@ module.exports = exports = function(env) {
           recompileUponModification(fileName, extension, io);
         }
       });
-    })
-    .end();
+
+      return q.all(promises);
+    });
+
+  if (shouldPromise) {
+    return promise;
+  } else {
+    promise.end();
+  }
 
   if (env.live) {
     // communicate to client whenever file is modified
@@ -237,7 +248,8 @@ function recompileUponModification(fileName, extension, io) {
         // this may be a static file that doesn't have a compile function, but
         // is a dependency for some other compiled file
         if (compileFns[fileName]) {
-          compileFns[fileName]();
+          compileFns[fileName]()
+            .end();
 
           // reset dependencies
           clearDependencies(fileName);
@@ -248,7 +260,8 @@ function recompileUponModification(fileName, extension, io) {
         for (var dependentFile in dependents[fileName]) {
           console.log('Compiling dependent:', dependentFile);
           if (compileFns[dependentFile]) {
-            compileFns[dependentFile]();
+            compileFns[dependentFile]()
+              .end();
           }
         }
       })
@@ -337,36 +350,30 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
       case 'jade':
 
         // run jade's render
-        q.ncall(jade.render, jade, contents, {
-          filename: fileName
-        })
+        return q.ncall(jade.render, jade, contents, { filename: fileName })
           .then(function(outputHTML) {
             var compiledFileName = fileNameSansExtension + '.html';
 
-            utils.writeFile(compiledFileName, outputHTML)
+            return utils.writeFile(compiledFileName, outputHTML)
               .then(function() {
                 console.log('Compiled ' + compiledFileName + '.');
               });
-          })
-          .end();
-        break;
+          });
 
       case 'styl':
       case 'stylus':
           // run stylus' render
-          q.ncall(stylus.render, stylus, contents, {
+          return q.ncall(stylus.render, stylus, contents, {
             filename: fileName,
             compress: true
           })
             .then(function(outputCSS) {
               var compiledFileName = fileNameSansExtension + '.css';
-              utils.writeFile(compiledFileName, outputCSS)
+              return utils.writeFile(compiledFileName, outputCSS)
                 .then(function() {
                   console.log('Compiled ' + compiledFileName + '.');
                 });
-            })
-            .end();
-        break;
+            });
     }
   };
 }

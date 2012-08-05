@@ -72,7 +72,7 @@ var fetch = sandboxedModule.require('../commands/fetch', {
 });
 var defaultEnv = { version: '', output: outputDir, type: 'js' };
 
-describe('nodefront fetch', function() {
+describe('`nodefront fetch`', function() {
   testFetch('jquery', '1.7.2');
   testFetch('dojo', '1.7.3');
   testFetch('ext-core', '3.1.0');
@@ -125,7 +125,7 @@ describe('nodefront fetch', function() {
         uglifyJSMock.uglify.setMinifiedCode(expected);
 
         return fetch(libraryName, utils.extend(defaultEnv,
-          { version: version, minify: true }), true);
+          { version: version, minify: true }), true, true);
       })
       .then(function() {
         return confirmFetch(libraryName, expected, version);
@@ -192,7 +192,7 @@ describe('nodefront fetch', function() {
 
           // get the libraryName via nodefront fetch
           return fetch(libraryName, utils.extend(defaultEnv,
-            { version: version }), true);
+            { version: version }), true, true);
         })
         .then(function() {
           return confirmFetch(libraryName, expected, version);
