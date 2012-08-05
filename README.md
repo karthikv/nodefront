@@ -1,4 +1,4 @@
-# Nodefront
+# Nodefront [![Build Status](https://secure.travis-ci.org/karthikv/nodefront.png)](http://travis-ci.org/karthikv/nodefront)
 
 To see a styled version of the documentation below, please visit [nodefront's website](http://karthikv.github.com/nodefront).
 

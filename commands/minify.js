@@ -179,7 +179,7 @@ function minify(fileName, toFileName, type) {
    */
   function imageExecCallback(error, stdout, stderr) {
     if (error) {
-      deferred.resolve(error);
+      deferred.reject(error);
     } else {
       console.log('Optimized ' + relativeFileName + ' to ' +
                   relativeToFileName + '.');
@@ -189,16 +189,16 @@ function minify(fileName, toFileName, type) {
 
   if (type === 'png') {
     // use optipng to optimize PNG
-    exec(__dirname + '/../executables/optipng -o4 -clobber -out ' +
-      toFileName + ' ' + fileName, function(error, stdout, stderr) {
+    exec('optipng -o4 -out ' + toFileName + ' ' + fileName,
+      function(error, stdout, stderr) {
         // remove backup file created by optipng
         exec('rm ' + toFileName + '.bak');
         imageExecCallback(error, stdout, stderr);
       });
   } else if (type === 'jpg' || type === 'jpeg') {
     // use jpegtran to optimize JPEG
-    exec(__dirname + '/../executables/jpegtran -optimize -progressive' +
-      ' -outfile ' + toFileName + ' ' + fileName, imageExecCallback);
+    exec('jpegtran -optimize -progressive -outfile ' + toFileName + ' ' +
+      fileName, imageExecCallback);
   } else {
     utils.readFile(fileName)
       .then(function(contents) {

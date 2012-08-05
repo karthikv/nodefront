@@ -120,7 +120,11 @@ describe('nodefront minify', function() {
           expectedDir + '/images/book.min.jpg');
       })
       .fin(function() {
-        return q.ncall(fs.unlink, fs, inputDir + '/images/book.min.jpg');
+        try {
+          fs.unlinkSync(inputDir + '/images/book.min.jpg');
+        } catch (error) {
+          // don't worry about this; there was likely an error earlier
+        }
       })
       .then(done)
       .end();
@@ -133,7 +137,11 @@ describe('nodefront minify', function() {
           expectedDir + '/images/placeholder.min.png');
       })
       .fin(function() {
-        return q.ncall(fs.unlink, fs, inputDir + '/images/placeholder.min.png');
+        try {
+          fs.unlinkSync(inputDir + '/images/placeholder.min.png');
+        } catch (error) {
+          // don't worry about this; there was likely an error earlier
+        }
       })
       .then(done)
       .end();
