@@ -324,8 +324,10 @@ function minifyFetchedFile(dirName, fileName) {
   return minifyCommand(utils.regExpEscape(fileName),
     { overwrite: true }, true)
     .then(function() {
-      // switch back to original dir
-      process.chdir(originalDir);
+      if (dirName) {
+        // switch back to original dir
+        process.chdir(originalDir);
+      }
     });
 }
 

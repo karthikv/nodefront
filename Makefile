@@ -7,4 +7,7 @@ test-fetch:
 test-minify:
 	@./node_modules/.bin/mocha test/test.minify.js --reporter list
 
+test-insert:
+	@./node_modules/.bin/mocha test/test.insert.js --reporter list
+
 .PHONY: test

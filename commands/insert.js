@@ -19,8 +19,11 @@ var rNotWhitespace = /[^ \t]/;
  *
  *  If the -a/--absolute flag is specified, an absolute path will be used for
  *  the inserted link/script tag.
+ *
+ * @param shouldPromise - if true, returns a promise that yields completion
  */
-module.exports = exports = function(libraryPath, filePath, env) {
+module.exports = exports = function(libraryPath, filePath, env,
+  shouldPromise) {
   var path;
   var tab = '';
   
@@ -49,19 +52,19 @@ module.exports = exports = function(libraryPath, filePath, env) {
     }
   }
 
-  utils.readFile(filePath)
+  var promise = utils.readFile(filePath)
     .then(function(contents) {
       var fileExtension = utils.getExtension(filePath);
       var newContents;
 
       if (fileExtension === 'jade') {
-        if (env.delete) {
+        if (env['delete']) {
           newContents = deleteLibraryFromJade(path, contents);
         } else {
           newContents = addLibraryToJade(path, contents, tab, env.head);
         }
       } else {
-        if (env.delete) {
+        if (env['delete']) {
           newContents = deleteLibraryFromHTML(path, contents);
         } else {
           newContents = addLibraryToHTML(path, contents, tab, env.head);
@@ -71,7 +74,7 @@ module.exports = exports = function(libraryPath, filePath, env) {
       if (contents !== newContents) {
         utils.writeFile(filePath, newContents)
           .then(function() {
-            if (env.delete) {
+            if (env['delete']) {
               console.log('Deleted ' + libraryPath + ' from ' + filePath +
                           ' successfully.');
             } else {
@@ -80,8 +83,13 @@ module.exports = exports = function(libraryPath, filePath, env) {
             }
           });
     }
-    })
-    .end();
+    });
+
+  if (shouldPromise) {
+    return promise;
+  } else {
+    promise.end();
+  }
 };
 
 /**
