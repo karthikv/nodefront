@@ -67,6 +67,20 @@ describe('`nodefront compile`', function() {
         .then(done)
         .end();
     });
+
+    it('Coffee files', function(done) {
+      testUtils.expectFilesToMatch(inputDir + '/script.js',
+        expectedDir + '/script.js')
+        .fin(function() {
+          try {
+            fs.unlinkSync(inputDir + '/script.js');
+          } catch (error) {
+            // don't worry about this; an error probably occurred above
+          }
+        })
+        .then(done)
+        .end();
+    });
   });
 
   describe('serves', function() {
@@ -128,6 +142,27 @@ describe('`nodefront compile`', function() {
         .fin(function() {
           try {
             fs.unlinkSync(inputDir + '/style.css');
+          } catch (error) {
+            // don't worry about this; an error probably occurred above
+          }
+        })
+        .then(done)
+        .end();
+    });
+
+    it('JS files', function(done) {
+      var responseBody;
+      q.ncall(request, this, 'http://localhost:' + port + '/script.js')
+        .spread(function(response, body) {
+          responseBody = body;
+          return utils.readFile(inputDir + '/script.js');
+        })
+        .then(function(expected) {
+          responseBody.should.eql(expected);
+        })
+        .fin(function() {
+          try {
+            fs.unlinkSync(inputDir + '/script.js');
           } catch (error) {
             // don't worry about this; an error probably occurred above
           }

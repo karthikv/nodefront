@@ -1,4 +1,5 @@
 var fs = require('fs');
+var pathLib = require('path');
 var request = require('request');
 var libraries = require('nconf');
 var q = require('q');
@@ -343,13 +344,15 @@ function minifyFetchedFile(dirName, fileName) {
  * @param dirName - if provided, the directory to the store the file in
  */
 function outputFileData(data, libraryName, fileName, dirName) {
+  var dirDisplay = pathLib.relative('.', dirName);
+
   // append a slash to dirName if it doesn't already have one
   if (dirName && dirName[dirName.length] !== '/') {
     dirName += '/';
   }
 
   fs.writeFileSync(dirName + fileName, data);
-  console.log('Fetched ' + libraryName + ' into ' + dirName + fileName + '.');
+  console.log('Fetched ' + libraryName + ' into ' + dirDisplay + fileName + '.');
 }
 
 /**

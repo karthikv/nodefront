@@ -74,11 +74,14 @@ module.exports = exports = function(libraryPath, filePath, env,
       if (contents !== newContents) {
         utils.writeFile(filePath, newContents)
           .then(function() {
+            var libraryDisplay = pathLib.relative('.', libraryPath);
+            var fileDisplay = pathLib.relative('.', filePath);
+
             if (env['delete']) {
-              console.log('Deleted ' + libraryPath + ' from ' + filePath +
-                          ' successfully.');
+              console.log('Deleted ' + libraryDisplay + ' from ' +
+                          fileDisplay + ' successfully.');
             } else {
-              console.log('Added ' + libraryPath + ' to ' + filePath +
+              console.log('Added ' + libraryDisplay + ' to ' + fileDisplay +
                           ' successfully.');
             }
           });

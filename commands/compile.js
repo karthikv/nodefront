@@ -4,9 +4,11 @@ var jade = require('jade');
 var stylus = require('stylus');
 var pathLib = require('path');
 var utils = require('../lib/utils');
+var coffeeScript = require('coffee-script');
 
 // files with these extensions need to be compiled
 var compiledExtensions = {
+  'coffee': undefined,
   'jade': undefined,
   'styl': undefined,
   'stylus': undefined
@@ -30,9 +32,9 @@ var rStylusInclude = /^[ \t]*@import[ \t]+([^\n]+)/gm;
 /**
  * Node Module Export
  * ------------------
- * Exports the compile command for nodefront. This finds all *.jade and *.styl
- * target files in the current directory and compiles them to corresponding
- * *.html and *.css.
+ * Exports the compile command for nodefront. This finds all *.jade, *.styl,
+ * *.stylus, and *.coffee target files in the current directory and compiles
+ * them to corresponding *.html, *.css, and *.js.
  *
  * @param env - the command-line environment
  *  If the -r/--recursive flag is specified, the current directory is
@@ -333,7 +335,7 @@ function recordDependencies(fileName, extension, contents) {
  * Function: generateCompileFn
  * ---------------------------
  * Given a file name and its extension, returns a function that compiles this
- * file based off of its type (jade, stylus, etc.).
+ * file based off of its type (jade, stylus, coffee, etc.).
  *
  * @param fileNameSansExtension - file name without extension
  * @param extension - the extension of the file name
@@ -347,16 +349,31 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
     var contents = fs.readFileSync(fileName, 'utf8');
 
     switch (extension) {
-      case 'jade':
+      case 'coffee':
+        // run coffee-script's compile
+        return q.fcall(function() {
+            return coffeeScript.compile(contents);
+          })
+          .then(function(outputJS) {
+            var compiledFileName = fileNameSansExtension + '.js';
+            var compiledFileDisplay = pathLib.relative('.', compiledFileName);
 
+            return utils.writeFile(compiledFileName, outputJS)
+              .then(function() {
+                console.log('Compiled ' + compiledFileDisplay + '.');
+              });
+          });
+
+      case 'jade':
         // run jade's render
         return q.ncall(jade.render, jade, contents, { filename: fileName })
           .then(function(outputHTML) {
             var compiledFileName = fileNameSansExtension + '.html';
+            var compiledFileDisplay = pathLib.relative('.', compiledFileName);
 
             return utils.writeFile(compiledFileName, outputHTML)
               .then(function() {
-                console.log('Compiled ' + compiledFileName + '.');
+                console.log('Compiled ' + compiledFileDisplay + '.');
               });
           });
 
@@ -369,9 +386,11 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
           })
             .then(function(outputCSS) {
               var compiledFileName = fileNameSansExtension + '.css';
+              var compiledFileDisplay = pathLib.relative('.', compiledFileName);
+
               return utils.writeFile(compiledFileName, outputCSS)
                 .then(function() {
-                  console.log('Compiled ' + compiledFileName + '.');
+                  console.log('Compiled ' + compiledFileDisplay + '.');
                 });
             });
     }
