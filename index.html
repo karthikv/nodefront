@@ -1,0 +1,340 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Nodefront by karthikv</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Nodefront</h1>
+        <p>A node.js-powered rapid front-end development utility.</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/karthikv/nodefront" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/karthikv/nodefront/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/karthikv/nodefront/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h2>Overview</h2>
+
+<p>Nodefront is a node.js-powered command-line utility that speeds up front-end development.</p>
+
+<h2>Installation</h2>
+
+<p>Installation is simple with npm:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>npm install -g nodefront
+</pre></div>
+
+<h2>Upgrading</h2>
+
+<p>If you need to upgrade nodefront, simply run:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>npm update -g nodefront
+</pre></div>
+
+<h2>Introductory Screencast</h2>
+
+<p>Before diving into the documentation, you may view a <a href="https://vimeo.com/46197434">screencast that introduces some of nodefront's key features on Vimeo</a>.</p>
+
+<h2>Command Summary</h2>
+
+<p>Compile: <code>nodefront compile</code> - Compiles Jade, Stylus, and CoffeeScript files to HTML, CSS, and JavaScript, respectively. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.</p>
+
+<p>Fetch: <code>nodefront fetch</code> - Automatically fetches CSS/JS libraries for use in your project. Provides an interactive mode to add new libraries.</p>
+
+<p>Insert: <code>nodefront insert</code> - Inserts CSS/JS libraries directly into your HTML or Jade files.</p>
+
+<p>Minify: <code>nodefront minify</code> - Minifies CSS and JS files. Can also optimize JPG and PNG images.</p>
+
+<h2>Compile Command</h2>
+
+<h3>Usage</h3>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront compile <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+
+<p>The compile command will look for all Jade (*.jade), Stylus (*.styl, *.stylus), and CoffeeScript (*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.</p>
+
+<h3>Example</h3>
+
+<p>If the directory structure initially looks like:</p>
+
+<pre><code>.
+|_ index.jade
+|_ styles.styl
+`_ script.coffee
+</code></pre>
+
+<p>After running <code>nodefront compile</code>, <code>index.jade</code> will be compiled to <code>index.html</code>, <code>styles.styl</code> will be compiled to <code>styles.css</code>, and <code>script.coffee</code> will be compiled to <code>script.js</code>, resulting in the following new directory structure:</p>
+
+<pre><code>.
+|_ index.jade
+|_ index.html
+|_ styles.styl
+|_ styles.css
+|_ script.coffee
+`_ script.js
+</code></pre>
+
+<h3>Options</h3>
+
+<p>Help: <code>nodefront compile -h/--help</code> outputs usage information about the compile command.</p>
+
+<p>Recursive: <code>nodefront compile -r/--recursive</code> recurses through sub-directories instead of only compiling Jade and Stylus files in the current directory.</p>
+
+<p>Watch: <code>nodefront compile -w/--watch</code> watches all Jade, Stylus, and CoffeeScript files in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. <code>watch</code> is dependency aware, meaning that if <code>index.jade</code> extends/includes <code>layout.jade</code>, when <code>layout.jade</code> is modified, both <code>layout.jade</code> and <code>index.jade</code> will be recompiled. This same awareness is present for Stylus files as well.</p>
+
+<p>Serve: <code>nodefront compile -s/--serve [port]</code> creates a <code>localhost</code> server via node.js that serves all files in the current directory and any subdirectories. By default, this server is created on port 3000, but this is modifiable via the [port] option. For example, <code>nodefront --serve 5387</code> will serve nodefront on port 5387.</p>
+
+<p>Live: <code>nodefront compile -l/--live [port]</code> mimics the serve option (see above) with some added file watching features. For each HTML page that is served to the browser, all of its file dependencies, including the source itself, its CSS styles, and its scripts, are monitored for changes. If the source itself or one of its scripts changes, the browser will automatically refresh. If a CSS stylesheet is modified, it is reloaded without refreshing via a cache-busting query string. This allows for live development with immediate feedback and circumvents the need to keep reloading the browser manually.</p>
+
+<p>For those who are interested in the more technical aspects of the live command, the <code>localhost</code> server that it creates automatically injects web socket code, courtesy of socket.io, into HTML pages. This allows communication between the client and the node.js server. Whenever a file is modified, the server notifies the client via the established socket connection. The client then assesses whether this file affects the current page and takes appropriate actions.</p>
+
+<h2>Fetch Command</h2>
+
+<h3>Usage</h3>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront fetch <span class="o">[</span>library<span class="o">]</span> <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+
+<p>The fetch command will download the given CSS/JS library, [library], from the web and add it to the current directory. Nodefront is already aware of many of the most popular CSS/JS libraries, but can easily be configured to fetch lesser-known ones.</p>
+
+<h3>Example</h3>
+
+<p>To fetch the latest version of jQuery, simply run:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront fetch jquery
+</pre></div>
+
+<p>jQuery 1.7.2 (as of 6/19/12) will then be added to the current directory. If, for instance, you'd like to fetch version 1.5, simply use the version option, specified by <code>-v</code> or <code>--version</code>:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront fetch jquery -v 1.5
+</pre></div>
+
+<p>jQuery 1.5 should then be downloaded into the current directory.</p>
+
+<h3>Options</h3>
+
+<p>Help: <code>nodefront fetch -h/--help</code> outputs usage information about the compile command.</p>
+
+<p>Type: <code>nodefront fetch [library] -t/--type [type]</code> will set the type, or extension, of the given library, [library]. When the library has finished downloading, it will then be named [library]-[version].[type]. Note that the type defaults to js if this option is not given.</p>
+
+<p>Output: <code>nodefront fetch [library] -o/--output [directory]</code> downloads the given library and stores the resultant file (see type option above), in the given directory, [directory].</p>
+
+<p>Version: <code>nodefront fetch [library] -v/--version [version]</code> downloads the given library at the provided version number, [version], and saves it to [library]-[version].[type] (see type option above).</p>
+
+<p>Interactive: <code>nodefront fetch [library] -i/--interactive</code> enables interactive mode, where you'll be provided with numerous dialogs that fully explain the process of adding a new library. You can alternatively specify all the configuration parameters necessary by using the command-line (see options below). Note that, if necessary, you can mix and match as well, specifying the URL parameter while also going into interactive mode to get some help setting the path.</p>
+
+<p>URL: <code>nodefront fetch [library] -u/--url [url]</code> will fetch the library file at the given URL, [url], and add it to the current directory with the name [library]-[version].[type] (see version/type options above). To make this flexible for different versions of the library, simply add the parameter <code>{{ version }}</code> where the version should be inserted in the URL. Then, the version parameter (see above) will determine what value this gets replaced with. Note that, if you specify the URL for a library, all configuration options are automatically saved, meaning that you can fetch the library again at any time simply by running <code>nodefront fetch [library]</code>. If you ever need to update the configuration options again, specify the URL once more.</p>
+
+<p>Path: <code>nodefront fetch [library] -p/--path [pathRegex]</code> requires the URL parameter to be provided (see above). It then assumes that the [url] points to a zip file, extracts all files within it, and finds the first one to match the regular expression [pathRegex]. This file will be considered the library you were looking for and is then downloaded.</p>
+
+<p>Minify: <code>nodefront fetch [library] -m/--minify</code> will fetch the given library and minify it upon download. Note that both CSS and JS libraries can be minified.</p>
+
+<h2>Insert Command</h2>
+
+<h3>Usage</h3>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront insert <span class="o">[</span>libraryPath<span class="o">]</span> <span class="o">[</span>file<span class="o">]</span> <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+
+<p>The insert command will insert the CSS or JS library, given by the path [libraryPath], into the HTML or Jade file specified by [file] as either a link or script tag. If [libraryPath] ends in '.css', a link tag will be appended to the head of the document. In like manner, if [libraryPath] ends in '.js', a script tag will be inserted in the footer prior to the end of the body (see head option for inserting into the head).</p>
+
+<h3>Examples</h3>
+
+<p>To insert a script tag containing jquery at the end of index.html, run:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront insert jquery-1.7.2.js index.html
+</pre></div>
+
+<p>If, instead, you would like the script tag to be appended to the head tag, simply specify the head option, specified by <code>-h</code> or <code>--head</code>:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront insert jquery-1.7.2.js index.html -h
+</pre></div>
+
+<p>Both of these will insert the tag <code>&lt;script src="jquery-1.7.2.js"&gt;&lt;/script&gt;</code> into index.html. For jade files, nodefront will insert <code>script(src='jquery-1.7.2.js')</code> instead. Note that nodefront will find the relative path between [libraryPath] and [file] and use that as the src attribute. If you would like an absolute path instead, use the absolute option, specified by <code>-a</code> or <code>--absolute</code>.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront insert jquery-1.7.2.js index.html -a
+</pre></div>
+
+<p>To remove <code>jquery-1.7.2.js</code> from a file, add the delete option, specified by <code>-d</code> or <code>--delete</code>.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront insert jquery-1.7.2.js index.html -ad
+</pre></div>
+
+<p>Make sure to maintain the absolute option if the original insertion used an absolute path.</p>
+
+<h3>Options</h3>
+
+<p>Help: <code>nodefront insert --help</code> outputs usage information about the insert command.</p>
+
+<p>Head: <code>nodefront insert [libraryPath] [file] -h/--head</code> will append the given library to the head of the document. By default, CSS libraries are added to the head, as they cannot be added elsewhere, and JS libraries are added prior to the end body tag.</p>
+
+<p>Absolute: <code>nodefront insert [libraryPath] [file] -a/--absolute</code> will use the absolute path of the given library, [libraryPath], as the value of the src/href attribute to the script/link tag that is inserted. By default, a relative path is used.</p>
+
+<p>Tab Length: <code>nodefront insert [libraryPath] [file] -t/--tab-length [length]</code> will use the provided tab length, [length], when inserting the script/link tag. By default, the tab length is 4, representing four spaces. If you would prefer hard tabs (<code>'\t'</code> characters), simply specify -1 as the tab length.</p>
+
+<p>Delete: <code>nodefront insert [libraryPath] [file] -d</code> will delete the library from the given file instead of inserting it. Make sure to maintain the absolute option (see above) if the original insertion used an absolute path for the src/href attribute.</p>
+
+<h2>Minify Command</h2>
+
+<h3>Usage</h3>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront minify <span class="o">[</span>fileRegex<span class="o">]</span> <span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+
+<p>The minify command finds all file paths in the current directory, without recursing (see the recursive option), that match the given fileRegex. It then minifies the corresponding files, using UglifyJS for JS files, YUI (the JS implementation) for CSS, JPEGtran for JPEG, and OptiPNG for PNG. By default, the output file name is the original file name without its extension followed by '.min.' and the original file name's extension. For example, if the original file name is 'style.css', the new file name is 'style.min.css'.</p>
+
+<h3>Examples</h3>
+
+<p>To minify script.js in the current directory into script.min.js, run:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront minify -p script.js
+</pre></div>
+
+<p>The plain option, specified by <code>-p</code> or <code>--plain</code>, changes [fileRegex] from a regular expression to just a plain text string.</p>
+
+<p>To minify all CSS files in the current directory, simply use the CSS option, <code>-c</code> or <code>-css</code> with no [fileRegex] parameter:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront minify -c
+</pre></div>
+
+<p>In like manner, the JS option, <code>-j</code> or  <code>--js</code>, and the images option, <code>-i</code> or <code>--images</code>, minify JS files and optimize all images, respectively. You can mix and match these options as necessary. To minify all CSS, JS, and image files in the current directory, for example, run:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront minify -cji
+</pre></div>
+
+<h3>Options</h3>
+
+<p>Help: <code>nodefront minify --help</code> outputs usage information about the minify command.</p>
+
+<p>Recursive: <code>nodefront minify [fileRegex] -r/--recursive</code> will minify all file paths in the current directory and in any sub-directories that match the regular expression [fileRegex].</p>
+
+<p>Plain: <code>nodefront minify [fileRegex] -p/--plain</code> will change [fileRegex] from being a regular expression to just a normal text string. With this option enabled, you can pinpoint the exact file you would like to minify by setting [fileRegex] to its path.</p>
+
+<p>Type: <code>nodefront minify [fileRegex] -t/--type [type]</code> will set the type of all the files that are being minified. Normally, the type of a given file is determined by its extension, with *.css, *.js, *.png, and *.jpg or *.jpeg representing CSS, JS, PNG, and JPEG files, respectively. If you would like to minify a file without an extension or with one that does not match these defaults, this option will let you force nodefront to treat it as if it had the extension [type]. For example, running <code>nodefront minify -p script -t js</code> would minify script as if it was a JS file even though it lacks a .js extension.</p>
+
+<p>Out: <code>nodefront minify [fileRegex] -o [file]</code> will minify all file paths in the current directory that match the regular expression [fileRegex] and put the output in the file named [file]. Include <code>{{ name }}</code> in [file] and it will be replaced by the name of the current file being minified without its extension. In like manner, include <code>{{ extension }}</code> in [file] and it will be replaced by the extension of the current file being minified. For example, assume you have the following directory structure:</p>
+
+<pre><code>.
+|_ main-script.js
+`_ main-style.css
+</code></pre>
+
+<p>If you run <code>nodefront minify main -o '{{ name }}-minified.{{ extension }}'</code>, main-script.js will be minified to main-script-minified.js and main-style.css will be minified to main-style-minified.css, leaving you with the following new directory structure:</p>
+
+<pre><code>.
+|_ main-script.js
+|_ main-script-minified.js
+|_ main-style.css
+`_ main-style-minified.js
+</code></pre>
+
+<p>This option defaults to <code>{{ name }}.min.{{ extension }}</code> if not provided.</p>
+
+<p>Overwrite: <code>nodefront minify [fileRegex] -w/--overwrite</code> will overwrite files will their minified versions instead of writing to <code>{{ name }}.min.{{ extension }}</code> (see out option). This is a shortcut to specifying <code>{{ name }}.{{ extension }}</code> for the out option.</p>
+
+<p>CSS: <code>nodefront minify -c/-css</code> will minify all CSS files in the current directory. This is a shortcut to <code>nodefront minify \.css$</code>.</p>
+
+<p>JS: <code>nodefront minify -j/-js</code> will minify all JS files in the current directory. This is a shortcut to <code>nodefront minify \.js$</code>.</p>
+
+<p>Images: <code>nodefront minify --i/--images</code> will minify all JPEG and PNG images in the current directory. This is a shortcut to <code>nodefront minify \.(jpg|jpeg|png)$</code>.</p>
+
+<p>Note that the last three options can be mix and matched as necessary to, for example, minify all CSS and JS, but no images, like so:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>nodefront minify -cj
+</pre></div>
+
+<h2>Contributors</h2>
+
+<h3>Karthik Viswanathan</h3>
+
+<ul>
+<li>GitHub: <a href="https://github.com/karthikv">@karthikv</a>
+</li>
+<li>Twitter: <a href="https://twitter.com/karthikvnet">@karthikvnet</a>
+</li>
+<li>Website: <a href="http://karthikv.net">http://karthikv.net</a>
+</li>
+<li>Email: <a href="mailto:me@karthikv.net">me@karthikv.net</a>
+</li>
+</ul><h2>Questions?</h2>
+
+<p>If you have any questions, comments, concerns, or suggestions, please feel free to create a new issue on <a href="https://github.com/karthikv/nodefront/issues">GitHub</a> or contact Karthik directly (see contributors section above).</p>
+
+<h2>Inspiration</h2>
+
+<ul>
+<li>
+<a href="https://github.com/volojs/volo">Volo</a> - "A JavaScript dependency manager and project creation tool that favors GitHub for the package repository."</li>
+<li>
+<a href="http://yeoman.io/">Yeoman</a> - "A robust and opinionated client-side stack, comprised of tools and frameworks that can help developers quickly build beautiful web applications."</li>
+</ul><h2>License</h2>
+
+<p>(The MIT License)</p>
+
+<p>Copyright (c) 2012 Karthik Viswanathan &lt;<a href="mailto:me@karthikv.net">me@karthikv.net</a>&gt;</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/karthikv">karthikv</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33546165-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
