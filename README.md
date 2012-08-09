@@ -14,13 +14,21 @@ Installation is simple with npm:
 $ npm install -g nodefront
 ```
 
+## Upgrading
+
+If you need to upgrade nodefront, simply run:
+
+```bash
+$ npm update -g nodefront
+```
+
 ## Introductory Screencast
 
 Before diving into the documentation, you may view a [screencast that introduces some of nodefront's key features on Vimeo](https://vimeo.com/46197434).
 
 ## Command Summary
 
-Compile: `nodefront compile` - Compiles Jade and Stylus files to HTML and CSS. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.
+Compile: `nodefront compile` - Compiles Jade, Stylus, and CoffeeScript files to HTML, CSS, and JavaScript, respectively. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.
 
 Fetch: `nodefront fetch` - Automatically fetches CSS/JS libraries for use in your project. Provides an interactive mode to add new libraries.
 
@@ -35,29 +43,32 @@ Minify: `nodefront minify` - Minifies CSS and JS files. Can also optimize JPG an
 $ nodefront compile [options]
 ```
 
-The compile command will look for all Jade (\*.jade) and Stylus (\*.styl, \*.stylus) files in the current directory without recursing (see the recursive option) and compile them to their HTML and CSS counterparts, simply replacing the extension of the originally-named file.
+The compile command will look for all Jade (\*.jade), Stylus (\*.styl, \*.stylus), and CoffeeScript (\*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.
 
 ### Example
 If the directory structure initially looks like:
 
     .
     |_ index.jade
-    `_ styles.styl
+    |_ styles.styl
+    `_ script.coffee
 
-After running `nodefront compile`, `index.jade` will be compiled to `index.html` and `styles.styl` will be compiled to `styles.css`, resulting in the following new directory structure:
+After running `nodefront compile`, `index.jade` will be compiled to `index.html`, `styles.styl` will be compiled to `styles.css`, and `script.coffee` will be compiled to `script.js`, resulting in the following new directory structure:
 
     .
     |_ index.jade
     |_ index.html
     |_ styles.styl
-    `_ styles.css
+    |_ styles.css
+    |_ script.coffee
+    `_ script.js
 
 ### Options
 Help: `nodefront compile -h/--help` outputs usage information about the compile command.
 
 Recursive: `nodefront compile -r/--recursive` recurses through sub-directories instead of only compiling Jade and Stylus files in the current directory.
 
-Watch: `nodefront compile -w/--watch` watches all Jade and Stylus files in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
+Watch: `nodefront compile -w/--watch` watches all Jade, Stylus, and CoffeeScript files in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
 
 Serve: `nodefront compile -s/--serve [port]` creates a `localhost` server via node.js that serves all files in the current directory and any subdirectories. By default, this server is created on port 3000, but this is modifiable via the [port] option. For example, `nodefront --serve 5387` will serve nodefront on port 5387.
 
