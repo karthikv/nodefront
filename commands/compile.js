@@ -347,11 +347,12 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
     var contents = fs.readFileSync(fileName, 'utf8');
+    var promise;
 
     switch (extension) {
       case 'coffee':
         // run coffee-script's compile
-        return q.fcall(function() {
+        promise = q.fcall(function() {
             return coffeeScript.compile(contents);
           })
           .then(function(outputJS) {
@@ -363,10 +364,11 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
                 console.log('Compiled ' + compiledFileDisplay + '.');
               });
           });
+        break;
 
       case 'jade':
         // run jade's render
-        return q.ncall(jade.render, jade, contents, { filename: fileName })
+        promise = q.ncall(jade.render, jade, contents, { filename: fileName })
           .then(function(outputHTML) {
             var compiledFileName = fileNameSansExtension + '.html';
             var compiledFileDisplay = pathLib.relative('.', compiledFileName);
@@ -376,11 +378,12 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
                 console.log('Compiled ' + compiledFileDisplay + '.');
               });
           });
+        break;
 
       case 'styl':
       case 'stylus':
           // run stylus' render
-          return q.ncall(stylus.render, stylus, contents, {
+          promise = q.ncall(stylus.render, stylus, contents, {
             filename: fileName,
             compress: true
           })
@@ -393,7 +396,13 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
                   console.log('Compiled ' + compiledFileDisplay + '.');
                 });
             });
+          break;
     }
+
+    return promise
+      .fail(function(error) {
+        console.error(error.message);
+      });
   };
 }
 
