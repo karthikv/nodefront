@@ -66,9 +66,9 @@ module.exports = exports = function(env, shouldPromise) {
   if (env.serve || env.live) {
     // serve the files on localhost
     if (typeof env.serve == 'number') {
-      server = serveFilesLocally(env.serve, env.live);
+      server = serveFilesLocally(env.serve, env.hostname, env.live);
     } else {
-      server = serveFilesLocally(3000, env.live);
+      server = serveFilesLocally(3000, env.hostname, env.live);
     }
   }
 
@@ -170,11 +170,12 @@ function trackModificationsLive(io, recursive) {
  * number.
  *
  * @param port - the port number to serve the files on
+ * @param hostname - the hostname to serve the files on
  * @param live - true if this is live mode
  *
  * @return the node HTTP server
  */
-function serveFilesLocally(port, live) {
+function serveFilesLocally(port, hostname, live) {
   var http = require('http');
   var mime = require('mime');
 
@@ -228,9 +229,9 @@ function serveFilesLocally(port, live) {
       response.writeHead(400, {'Content-Type': 'text/plain'});
       response.end('Unsupported request type.');
     }
-  }).listen(port, '127.0.0.1');
+  }).listen(port, hostname);
 
-  console.log('Serving your files at http://127.0.0.1:' + port + '/.');
+  console.log('Serving your files at http://' + hostname + ':' + port + '/.');
   return server;
 }
 

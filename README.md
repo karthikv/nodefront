@@ -76,6 +76,8 @@ Live: `nodefront compile -l/--live [port]` mimics the serve option (see above) w
 
 For those who are interested in the more technical aspects of the live command, the `localhost` server that it creates automatically injects web socket code, courtesy of socket.io, into HTML pages. This allows communication between the client and the node.js server. Whenever a file is modified, the server notifies the client via the established socket connection. The client then assesses whether this file affects the current page and takes appropriate actions.
 
+Hostname: `nodefront compile -h/--hostname [hostname]` sets which hostname to serve files on. This must be used in conjunction with the live or serve option (see above). If not specified, live or serve defaults to serving files on localhost.
+
 ## Fetch Command
 ### Usage
 
