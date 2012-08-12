@@ -52,10 +52,13 @@
 
 <h2>Upgrading</h2>
 
-<p>If you need to upgrade nodefront, simply run:</p>
+<p>Upgrading nodefront should be done by reinstalling, like so:</p>
 
-<div class="highlight"><pre><span class="nv">$ </span>npm update -g nodefront
+<div class="highlight"><pre><span class="nv">$ </span>npm uninstall -g nodefront
+<span class="nv">$ </span>npm install -g nodefront
 </pre></div>
+
+<p>It is not recommended to use <code>npm update nodefront</code> due to a <a href="https://github.com/isaacs/npm/issues/2390">known bug</a> that prevents it from adding new dependencies correctly.</p>
 
 <h2>Introductory Screencast</h2>
 
