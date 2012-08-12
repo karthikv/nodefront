@@ -16,11 +16,14 @@ $ npm install -g nodefront
 
 ## Upgrading
 
-If you need to upgrade nodefront, simply run:
+Upgrading nodefront should be done by reinstalling, like so:
 
 ```bash
-$ npm update -g nodefront
+$ npm uninstall -g nodefront
+$ npm install -g nodefront
 ```
+
+It is not recommended to use `npm update nodefront` due to a [known bug](https://github.com/isaacs/npm/issues/2390) that prevents it from adding new dependencies correctly.
 
 ## Introductory Screencast
 
