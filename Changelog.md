@@ -1,4 +1,10 @@
 
+0.0.7 / 2012-08-14 
+==================
+
+  * Fix bug that prevents setting port number for compile live mode. Addresses issue #5.
+  * Update preferred method of upgrading nodefront in README.
+
 0.0.6 / 2012-08-11 
 ==================
 
