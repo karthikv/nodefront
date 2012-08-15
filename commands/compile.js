@@ -65,8 +65,8 @@ module.exports = exports = function(env, shouldPromise) {
 
   if (env.serve || env.live) {
     // serve the files on localhost
-    if (typeof env.serve == 'number') {
-      server = serveFilesLocally(env.serve, env.hostname, env.live);
+    if (typeof env.serve === 'number' || typeof env.live === 'number') {
+      server = serveFilesLocally(env.serve || env.live, env.hostname, env.live);
     } else {
       server = serveFilesLocally(3000, env.hostname, env.live);
     }
