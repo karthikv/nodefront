@@ -1,4 +1,11 @@
 
+0.0.8 / 2012-08-15 
+==================
+
+  * Add markdown support information to the README. Addresses issue #9.
+  * Serve index.html files when visiting the containing directory for compile serve/live mode. Addresses issue #8.
+  * Make nodefront print help when run with no arguments. Rename compile -h option to not conflict with help. Addresses issue #7.
+
 0.0.7 / 2012-08-14 
 ==================
 
