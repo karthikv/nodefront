@@ -22,9 +22,8 @@ program
   .option('-l, --live [port]', 'Implies -w/--watch and -s/--serve [port].' +
     ' Serves files on localhost and automatically refreshes browser upon' +
     ' modification of HTML/CSS/JS files.', Number)
-  .option('-h, --hostname <hostname>', 'Only applicable when -s/--serve or' +
-    ' -l/--live is specified. Sets the hostname to serve files on.', String,
-    '127.0.0.1')
+  .option('-n, --hostname <hostname>', 'Only applicable when -s/--serve or' +
+    ' -l/--live is specified. Sets the hostname to serve files on.', String)
   .action(require('./commands/compile'));
 
 // fetch libraries
@@ -92,3 +91,7 @@ program
   .action(require('./commands/minify'));
 
 program.parse(process.argv);
+if (process.argv.length === 2) {
+  // no arguments were provided; output the help
+  program.outputHelp();
+}

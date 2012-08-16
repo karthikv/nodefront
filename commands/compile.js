@@ -64,7 +64,11 @@ module.exports = exports = function(env, shouldPromise) {
   var io;
 
   if (env.serve || env.live) {
-    // serve the files on localhost
+    // default to serving the files on localhost
+    env.hostname = env.hostname || '127.0.0.1';
+
+    // serve and live default to boolean options, but can be numeric if a port
+    // is provided; check for this and serve the files accordingly
     if (typeof env.serve === 'number' || typeof env.live === 'number') {
       server = serveFilesLocally(env.serve || env.live, env.hostname, env.live);
     } else {
