@@ -113,11 +113,7 @@ describe('`nodefront compile`', function() {
           responseBody.should.eql(expected);
         })
         .fin(function() {
-          try {
-            fs.unlinkSync(inputDir + '/index.html');
-          } catch (error) {
-            // don't worry about this; an error probably occurred above
-          }
+          // index.html will be deleted in next test
 
           try {
             fs.unlinkSync(inputDir + '/layout.html');
@@ -128,6 +124,28 @@ describe('`nodefront compile`', function() {
         .then(done)
         .end();
     });
+
+    it('index.html files when visiting the containing directory',
+      function(done) {
+        var responseBody;
+        q.ncall(request, this, 'http://localhost:' + port + '/')
+          .spread(function(response, body) {
+            responseBody = body;
+            return utils.readFile(inputDir + '/index.html');
+          })
+          .then(function(expected) {
+            responseBody.should.eql(expected);
+          })
+          .fin(function() {
+            try {
+              fs.unlinkSync(inputDir + '/index.html');
+            } catch (error) {
+              // don't worry about this; an error probably occurred above
+            }
+          })
+          .then(done)
+          .end();
+      });
 
     it('CSS files', function(done) {
       var responseBody;
