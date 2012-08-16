@@ -81,6 +81,15 @@ For those who are interested in the more technical aspects of the live command, 
 
 Hostname: `nodefront compile -n/--hostname [hostname]` sets which hostname to serve files on. This must be used in conjunction with the live or serve option (see above). If not specified, live or serve defaults to serving files on localhost.
 
+### Markdown Support
+If you'd like markdown support for Jade, simply install the [marked](https://github.com/chjj/marked) library, like so:
+
+```bash
+$ npm install -g marked
+```
+
+Jade should automatically interface with it.
+
 ## Fetch Command
 ### Usage
 
