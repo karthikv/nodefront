@@ -1,4 +1,9 @@
 
+0.1.0 / 2012-08-17 
+==================
+
+  * Use [consolidate-build](https://github.com/ForbesLindesay/consolidate-build) to support a variety of templating/built languages. Addresses issue #6.
+
 0.0.8 / 2012-08-15 
 ==================
 
