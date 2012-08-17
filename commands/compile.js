@@ -1,17 +1,36 @@
 var fs = require('fs');
 var q = require('q');
-var jade = require('jade');
-var stylus = require('stylus');
 var pathLib = require('path');
+var build = require('consolidate-build');
 var utils = require('../lib/utils');
-var coffeeScript = require('coffee-script');
 
-// files with these extensions need to be compiled
+// files with these extensions need to be compiled;
+// map of extension to compile => resultant compiled extension
 var compiledExtensions = {
-  'coffee': undefined,
-  'jade': undefined,
-  'styl': undefined,
-  'stylus': undefined
+  coffee: 'js',
+  dust: 'html',
+  eco: 'html',
+  ejs: 'html',
+  haml: 'html',
+  'haml-coffee': 'html',
+  handlebars: 'html',
+  hogan: 'html',
+  jade: 'html',
+  jazz: 'html',
+  jqtpl: 'html',
+  just: 'html',
+  less: 'css',
+  liquor: 'html',
+  markdown: 'html',
+  mustache: 'html',
+  qejs: 'html',
+  swig: 'html',
+  sass: 'css',
+  styl: 'css',
+  stylus: 'css',
+  underscore: 'html',
+  walrus: 'html',
+  whiskers: 'html'
 };
 
 // compile functions for each file; file name => function map
@@ -370,61 +389,25 @@ function recordDependencies(fileName, extension, contents) {
 function generateCompileFn(fileNameSansExtension, extension, live) {
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
-    var contents = fs.readFileSync(fileName, 'utf8');
-    var promise;
+    // always default to compressing files
+    var options = { compress: true };
 
-    switch (extension) {
-      case 'coffee':
-        // run coffee-script's compile
-        promise = q.fcall(function() {
-            return coffeeScript.compile(contents);
-          })
-          .then(function(outputJS) {
-            var compiledFileName = fileNameSansExtension + '.js';
-            var compiledFileDisplay = pathLib.relative('.', compiledFileName);
+    // consolidate-build will take care of picking which compiler to use;
+    // simply use the file extension as a key
+    return q.ncall(build[extension], build[extension], fileName, options)
+      .then(function(output) {
+        var newExtension = compiledExtensions[extension];
+        var compiledFileName = fileNameSansExtension + '.' + newExtension;
+        var compiledFileDisplay = pathLib.relative('.', compiledFileName);
 
-            return utils.writeFile(compiledFileName, outputJS)
-              .then(function() {
-                console.log('Compiled ' + compiledFileDisplay + '.');
-              });
+        return utils.writeFile(compiledFileName, output)
+          .then(function() {
+            console.log('Compiled ' + compiledFileDisplay + '.');
           });
-        break;
-
-      case 'jade':
-        // run jade's render
-        promise = q.ncall(jade.render, jade, contents, { filename: fileName })
-          .then(function(outputHTML) {
-            var compiledFileName = fileNameSansExtension + '.html';
-            var compiledFileDisplay = pathLib.relative('.', compiledFileName);
-
-            return utils.writeFile(compiledFileName, outputHTML)
-              .then(function() {
-                console.log('Compiled ' + compiledFileDisplay + '.');
-              });
-          });
-        break;
-
-      case 'styl':
-      case 'stylus':
-          // run stylus' render
-          promise = q.ncall(stylus.render, stylus, contents, {
-            filename: fileName,
-            compress: true
-          })
-            .then(function(outputCSS) {
-              var compiledFileName = fileNameSansExtension + '.css';
-              var compiledFileDisplay = pathLib.relative('.', compiledFileName);
-
-              return utils.writeFile(compiledFileName, outputCSS)
-                .then(function() {
-                  console.log('Compiled ' + compiledFileDisplay + '.');
-                });
-            });
-          break;
-    }
-
-    return promise
+      })
       .fail(function(error) {
+        // if a compilation error occurs, don't end the program, as this may be
+        // serve/live mode; simply print the error out
         console.error(error.message);
       });
   };

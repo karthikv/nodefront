@@ -31,7 +31,7 @@ Before diving into the documentation, you may view a [screencast that introduces
 
 ## Command Summary
 
-Compile: `nodefront compile` - Compiles Jade, Stylus, and CoffeeScript files to HTML, CSS, and JavaScript, respectively. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.
+Compile: `nodefront compile` - Compiles a variety of templating and built languages (see compile command below), including, by default, Jade, Stylus, and CoffeeScript. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.
 
 Fetch: `nodefront fetch` - Automatically fetches CSS/JS libraries for use in your project. Provides an interactive mode to add new libraries.
 
@@ -46,7 +46,43 @@ Minify: `nodefront minify` - Minifies CSS and JS files. Can also optimize JPG an
 $ nodefront compile [options]
 ```
 
-The compile command will look for all Jade (\*.jade), Stylus (\*.styl, \*.stylus), and CoffeeScript (\*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.
+The compile command, by default, will look for all Jade (\*.jade), Stylus (\*.styl, \*.stylus), and CoffeeScript (\*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.
+
+This command, however, is not limited to only these three file types. Because nodefront uses [consolidate-build](https://github.com/ForbesLindesay/consolidate-build), all of the following templating and built languages are supported:
+
+- [coffee-script](https://github.com/jashkenas/coffee-script) - [website](http://coffeescript.org/)
+- [dust](https://github.com/akdubya/dustjs) - [website](http://akdubya.github.com/dustjs/)
+- [eco](https://github.com/sstephenson/eco)
+- [ejs](https://github.com/visionmedia/ejs)
+- [haml](https://github.com/visionmedia/haml.js) - [website](http://haml-lang.com/)
+- [haml-coffee](https://github.com/9elements/haml-coffee) - [website](http://haml-lang.com/)
+- [handlebars](https://github.com/wycats/handlebars.js/) - [website](http://handlebarsjs.com/)
+- [hogan](https://github.com/twitter/hogan.js) - [website](http://twitter.github.com/hogan.js/)
+- [jade](https://github.com/visionmedia/jade) - [website](http://jade-lang.com/)
+- [jazz](https://github.com/shinetech/jazz)
+- [jqtpl](https://github.com/kof/node-jqtpl) - [website](http://api.jquery.com/category/plugins/templates/)
+- [JUST](https://github.com/baryshev/just)
+- [less](https://github.com/cloudhead/less.js) - [website](http://lesscss.org)
+- [liquor](https://github.com/chjj/liquor)
+- [markdown](http://daringfireball.net/projects/markdown/)
+- [mustache](https://github.com/janl/mustache.js)
+- [QEJS](https://github.com/jepso/QEJS)
+- [sass](https://github.com/visionmedia/sass.js) - [website](http://sass-lang.com/)
+- [stylus](https://github.com/learnboost/stylus) - [website](http://learnboost.github.com/stylus/)
+- [swig](https://github.com/paularmstrong/swig) - [website](http://paularmstrong.github.com/swig/)
+- [underscore](https://github.com/documentcloud/underscore) - [website](http://documentcloud.github.com/underscore/)
+- [walrus](https://github.com/jeremyruppel/walrus) - [website](http://documentup.com/jeremyruppel/walrus/)
+- [whiskers](https://github.com/gsf/whiskers.js/tree/)
+
+To employ any of the above languages other than the three defaults, you'll need to install their respective engines. For example, if you'd like to use ejs, you'll need to run:
+
+```bash
+npm install -g ejs
+```
+
+For Markdown specifically, you have the option of installing [marked](https://github.com/chjj/marked), [discount](https://github.com/visionmedia/node-discount), [markdown-js](https://github.com/Gozala/markdown-js) or [markdown](https://github.com/evilstreak/markdown-js). If more than one of these are installed, the first in that list will take precedence.
+
+Then, simply create files with the extension corresponding to the engine you're using (e.g. '.ejs' for ejs files) and nodefront will automatically compile them when you run the compile command.
 
 ### Example
 If the directory structure initially looks like:
@@ -69,9 +105,9 @@ After running `nodefront compile`, `index.jade` will be compiled to `index.html`
 ### Options
 Help: `nodefront compile -h/--help` outputs usage information about the compile command.
 
-Recursive: `nodefront compile -r/--recursive` recurses through sub-directories instead of only compiling Jade and Stylus files in the current directory.
+Recursive: `nodefront compile -r/--recursive` recurses through sub-directories instead of only compiling files in the current directory.
 
-Watch: `nodefront compile -w/--watch` watches all Jade, Stylus, and CoffeeScript files in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
+Watch: `nodefront compile -w/--watch` watches all files that can be compiled in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
 
 Serve: `nodefront compile -s/--serve [port]` creates a `localhost` server via node.js that serves all files in the current directory and any subdirectories. By default, this server is created on port 3000, but this is modifiable via the [port] option. For example, `nodefront --serve 5387` will serve nodefront on port 5387.
 
@@ -248,11 +284,15 @@ $ nodefront minify -cj
 ```
 
 ## Contributors
-### Karthik Viswanathan
+### Karthik Viswanathan - nodefront core developer
 - GitHub: [@karthikv](https://github.com/karthikv)
 - Twitter: [@karthikvnet](https://twitter.com/karthikvnet)
 - Website: [http://karthikv.net](http://karthikv.net)
 - Email: me@karthikv.net
+
+### Forbes Lindesay - [consolidate-build](https://github.com/ForbesLindesay/consolidate-build) core developer
+- GitHub: [@ForbesLindesay](https://github.com/ForbesLindesay)
+- Website: [http://www.jepso.com](http://www.jepso.com)
 
 ## Questions?
 If you have any questions, comments, concerns, or suggestions, please feel free to create a new issue on [GitHub](https://github.com/karthikv/nodefront/issues) or contact Karthik directly (see contributors section above).
