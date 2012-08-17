@@ -66,7 +66,7 @@
 
 <h2>Command Summary</h2>
 
-<p>Compile: <code>nodefront compile</code> - Compiles Jade, Stylus, and CoffeeScript files to HTML, CSS, and JavaScript, respectively. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.</p>
+<p>Compile: <code>nodefront compile</code> - Compiles a variety of templating and built languages (see compile command below), including, by default, Jade, Stylus, and CoffeeScript. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.</p>
 
 <p>Fetch: <code>nodefront fetch</code> - Automatically fetches CSS/JS libraries for use in your project. Provides an interactive mode to add new libraries.</p>
 
@@ -81,7 +81,70 @@
 <div class="highlight"><pre><span class="nv">$ </span>nodefront compile <span class="o">[</span>options<span class="o">]</span>
 </pre></div>
 
-<p>The compile command will look for all Jade (*.jade), Stylus (*.styl, *.stylus), and CoffeeScript (*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.</p>
+<p>The compile command, by default, will look for all Jade (*.jade), Stylus (*.styl, *.stylus), and CoffeeScript (*.coffee) files in the current directory without recursing (see the recursive option) and compile them to their HTML, CSS, and JS counterparts, simply replacing the extension of the originally-named file.</p>
+
+<p>This command, however, is not limited to only these three file types. Because nodefront uses <a href="https://github.com/ForbesLindesay/consolidate-build">consolidate-build</a>, all of the following templating and built languages are supported:</p>
+
+<ul>
+<li>
+<a href="https://github.com/jashkenas/coffee-script">coffee-script</a> - <a href="http://coffeescript.org/">website</a>
+</li>
+<li>
+<a href="https://github.com/akdubya/dustjs">dust</a> - <a href="http://akdubya.github.com/dustjs/">website</a>
+</li>
+<li><a href="https://github.com/sstephenson/eco">eco</a></li>
+<li><a href="https://github.com/visionmedia/ejs">ejs</a></li>
+<li>
+<a href="https://github.com/visionmedia/haml.js">haml</a> - <a href="http://haml-lang.com/">website</a>
+</li>
+<li>
+<a href="https://github.com/9elements/haml-coffee">haml-coffee</a> - <a href="http://haml-lang.com/">website</a>
+</li>
+<li>
+<a href="https://github.com/wycats/handlebars.js/">handlebars</a> - <a href="http://handlebarsjs.com/">website</a>
+</li>
+<li>
+<a href="https://github.com/twitter/hogan.js">hogan</a> - <a href="http://twitter.github.com/hogan.js/">website</a>
+</li>
+<li>
+<a href="https://github.com/visionmedia/jade">jade</a> - <a href="http://jade-lang.com/">website</a>
+</li>
+<li><a href="https://github.com/shinetech/jazz">jazz</a></li>
+<li>
+<a href="https://github.com/kof/node-jqtpl">jqtpl</a> - <a href="http://api.jquery.com/category/plugins/templates/">website</a>
+</li>
+<li><a href="https://github.com/baryshev/just">JUST</a></li>
+<li>
+<a href="https://github.com/cloudhead/less.js">less</a> - <a href="http://lesscss.org">website</a>
+</li>
+<li><a href="https://github.com/chjj/liquor">liquor</a></li>
+<li><a href="http://daringfireball.net/projects/markdown/">markdown</a></li>
+<li><a href="https://github.com/janl/mustache.js">mustache</a></li>
+<li><a href="https://github.com/jepso/QEJS">QEJS</a></li>
+<li>
+<a href="https://github.com/visionmedia/sass.js">sass</a> - <a href="http://sass-lang.com/">website</a>
+</li>
+<li>
+<a href="https://github.com/learnboost/stylus">stylus</a> - <a href="http://learnboost.github.com/stylus/">website</a>
+</li>
+<li>
+<a href="https://github.com/paularmstrong/swig">swig</a> - <a href="http://paularmstrong.github.com/swig/">website</a>
+</li>
+<li>
+<a href="https://github.com/documentcloud/underscore">underscore</a> - <a href="http://documentcloud.github.com/underscore/">website</a>
+</li>
+<li>
+<a href="https://github.com/jeremyruppel/walrus">walrus</a> - <a href="http://documentup.com/jeremyruppel/walrus/">website</a>
+</li>
+<li><a href="https://github.com/gsf/whiskers.js/tree/">whiskers</a></li>
+</ul><p>To employ any of the above languages other than the three defaults, you'll need to install their respective engines. For example, if you'd like to use ejs, you'll need to run:</p>
+
+<div class="highlight"><pre>npm install -g ejs
+</pre></div>
+
+<p>For Markdown specifically, you have the option of installing <a href="https://github.com/chjj/marked">marked</a>, <a href="https://github.com/visionmedia/node-discount">discount</a>, <a href="https://github.com/Gozala/markdown-js">markdown-js</a> or <a href="https://github.com/evilstreak/markdown-js">markdown</a>. If more than one of these are installed, the first in that list will take precedence.</p>
+
+<p>Then, simply create files with the extension corresponding to the engine you're using (e.g. '.ejs' for ejs files) and nodefront will automatically compile them when you run the compile command.</p>
 
 <h3>Example</h3>
 
@@ -108,9 +171,9 @@
 
 <p>Help: <code>nodefront compile -h/--help</code> outputs usage information about the compile command.</p>
 
-<p>Recursive: <code>nodefront compile -r/--recursive</code> recurses through sub-directories instead of only compiling Jade and Stylus files in the current directory.</p>
+<p>Recursive: <code>nodefront compile -r/--recursive</code> recurses through sub-directories instead of only compiling files in the current directory.</p>
 
-<p>Watch: <code>nodefront compile -w/--watch</code> watches all Jade, Stylus, and CoffeeScript files in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. <code>watch</code> is dependency aware, meaning that if <code>index.jade</code> extends/includes <code>layout.jade</code>, when <code>layout.jade</code> is modified, both <code>layout.jade</code> and <code>index.jade</code> will be recompiled. This same awareness is present for Stylus files as well.</p>
+<p>Watch: <code>nodefront compile -w/--watch</code> watches all files that can be compiled in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. <code>watch</code> is dependency aware, meaning that if <code>index.jade</code> extends/includes <code>layout.jade</code>, when <code>layout.jade</code> is modified, both <code>layout.jade</code> and <code>index.jade</code> will be recompiled. This same awareness is present for Stylus files as well.</p>
 
 <p>Serve: <code>nodefront compile -s/--serve [port]</code> creates a <code>localhost</code> server via node.js that serves all files in the current directory and any subdirectories. By default, this server is created on port 3000, but this is modifiable via the [port] option. For example, <code>nodefront --serve 5387</code> will serve nodefront on port 5387.</p>
 
@@ -286,7 +349,7 @@
 
 <h2>Contributors</h2>
 
-<h3>Karthik Viswanathan</h3>
+<h3>Karthik Viswanathan - nodefront core developer</h3>
 
 <ul>
 <li>GitHub: <a href="https://github.com/karthikv">@karthikv</a>
@@ -296,6 +359,13 @@
 <li>Website: <a href="http://karthikv.net">http://karthikv.net</a>
 </li>
 <li>Email: <a href="mailto:me@karthikv.net">me@karthikv.net</a>
+</li>
+</ul><h3>Forbes Lindesay - <a href="https://github.com/ForbesLindesay/consolidate-build">consolidate-build</a> core developer</h3>
+
+<ul>
+<li>GitHub: <a href="https://github.com/ForbesLindesay">@ForbesLindesay</a>
+</li>
+<li>Website: <a href="http://www.jepso.com">http://www.jepso.com</a>
 </li>
 </ul><h2>Questions?</h2>
 
