@@ -1,6 +1,7 @@
 var fs = require('fs');
 var should = require('should');
 var utils = require('../../lib/utils');
+var q = require('q');
 
 /**
  * Function: expectFilesToMatch
@@ -14,15 +15,17 @@ var utils = require('../../lib/utils');
  *  otherwise
  */
 exports.expectFilesToMatch = function(fileNameA, fileNameB) {
-  var expected;
-  return utils.readFile(fileNameA)
-    .then(function(contents) {
-      expected = contents;
-      return utils.readFile(fileNameB);
-    })
-    .then(function(contents) {
+  var expected = utils.readFile(fileNameA);
+  var actual = utils.readFile(fileNameB);
+
+  return q.all([expected, actual])
+    .spread(function(expected, actual) {
+      // make line-endings consistent
+      actual = actual.replace('\r\n', '\n');
+      expected = expected.replace('\r\n', '\n');
+
       try {
-        contents.should.eql(expected);
+        actual.should.equal(expected);
       } catch (error) {
         // don't print out contents and expected because they are too large
         throw new Error("Contents don't match expected.");
