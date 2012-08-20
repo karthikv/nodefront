@@ -90,7 +90,7 @@ module.exports = exports = function(env, shouldPromise) {
         if (env.watch) {
           // record dependencies for dependency-intelligent recompilation
           recordDependencies(fileName, extension, contents);
-          recompileUponModification(fileName, extension, io);
+          recompileUponModification(fileName, extension);
         }
       });
 
@@ -113,7 +113,7 @@ module.exports = exports = function(env, shouldPromise) {
  * @param fileName - the name of the file
  * @param extension - the extension of the file
  */
-function recompileUponModification(fileName, extension, io) {
+function recompileUponModification(fileName, extension) {
   utils.watchFileForModification(fileName, 1000, function() {
     q.ncall(fs.readFile, fs, fileName, 'utf8')
       .then(function(contents) {

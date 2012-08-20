@@ -29,3 +29,51 @@ exports.expectFilesToMatch = function(fileNameA, fileNameB) {
       }
     });
 };
+
+/**
+ * Function: mockUtilsModification
+ * -------------------------------
+ * Mocks the watchFileForModification function in the utils module. Adds a
+ * mockFileModication function to utils that immediately triggers a given
+ * file's modification callback.
+ *
+ * @return the mocked utils module
+ */
+exports.mockUtilsModifications = function() {
+  var utils = require('../../lib/utils');
+  var events = require('events');
+  var emitter = new events.EventEmitter();
+
+  utils.watchFileForModification = function(fileName, interval, callback) {
+    emitter.on('mockModification', function(fileModified) {
+      if (fileModified === fileName) {
+        // make sure the modification time of the current stat is greater than
+        // the modification time of the old stat when triggering the callback
+        callback({ mtime: 10 }, { mtime: 9 });
+      }
+    });
+  };
+
+  /**
+   * Function: mockFileModification
+   * ------------------------------
+   * Immediately triggers the modification callback for the given file.
+   *
+   * @param fileName - the file to trigger a modification callback for
+   */
+  utils.mockFileModification = function(fileName) {
+    emitter.emit('mockModification', fileName);
+  };
+
+  /**
+   * Function: removeMockModificationListeners
+   * -----------------------------------------
+   * Removes any EventEmitter listeners associated with mocked modifications
+   * thus far. Doesn't stop future mocked modifications.
+   */
+  utils.removeMockModificationListeners = function() {
+    emitter.removeAllListeners();
+  };
+
+  return utils;
+};

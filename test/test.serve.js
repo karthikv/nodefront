@@ -3,7 +3,9 @@ var request = require('request');
 var sandboxedModule = require('sandboxed-module');
 var should = require('should');
 var Zombie = require('zombie');
+
 var utils = require('../lib/utils');
+var testUtils = require('./lib/utils');
 
 var compileCalled = false;
 var compileMock = function(env) {
@@ -18,28 +20,11 @@ var compileMock = function(env) {
   return q.defer().resolve();
 };
 
-var events = require('events');
-var emitter = new events.EventEmitter();
-
-utils.watchFileForModification = function(fileName, interval, callback) {
-  emitter.on('mockModification', function(fileModified) {
-    if (fileModified === fileName) {
-      // make sure the modification time of the current stat is greater than
-      // the modification time of the old stat when triggering the callback
-      callback({ mtime: 10 }, { mtime: 9 });
-    }
-  });
-};
-
-utils.mockFileModification = function(fileName) {
-  emitter.emit('mockModification', fileName);
-};
-
 var inputDir = __dirname + '/resources/serve/input';
 var serve = sandboxedModule.require('../commands/serve', {
   requires: {
     './compile': compileMock,
-    '../lib/utils': utils
+    '../lib/utils': testUtils.mockUtilsModifications()
   }
 });
 
@@ -218,7 +203,7 @@ describe('`nodefront serve`', function() {
     });
 
     afterEach(function() {
-      emitter.removeAllListeners();
+      utils.removeMockModificationListeners();
       serve.server.close();
     });
 
