@@ -4,7 +4,6 @@ var utils = require('../lib/utils');
 var testUtils = require('./lib/utils');
 var sandboxedModule = require('sandboxed-module');
 
-var nodefront = __dirname + '/../nodefront.js';
 var inputDir = __dirname + '/resources/minify/input';
 var expectedDir = __dirname + '/resources/minify/expected';
 

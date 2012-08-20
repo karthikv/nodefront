@@ -17,14 +17,18 @@ program
   .option('-r, --recursive', 'Recurse through directories.')
   .option('-w, --watch', 'Recompile files upon modification. Intelligently' +
     ' recompile dependencies.')
-  .option('-s, --serve [port]', 'Serve files on localhost at the given port' +
-    ' number, which defaults to 3000.', Number)
-  .option('-l, --live [port]', 'Implies -w/--watch and -s/--serve [port].' +
-    ' Serves files on localhost and automatically refreshes browser upon' +
-    ' modification of HTML/CSS/JS files.', Number)
-  .option('-n, --hostname <hostname>', 'Only applicable when -s/--serve or' +
-    ' -l/--live is specified. Sets the hostname to serve files on.', String)
   .action(require('./commands/compile'));
+
+// serve files
+program
+  .command('serve [port] [hostname]')
+  .description('Serves files on the given hostname and port, defaulting to' +
+               ' localhost:3000.')
+  .option('-c, --compile', 'Shortcut to run nodefront compile -w/--watch' +
+          ' simultaneousy')
+  .option('-l, --live', 'Automatically refreshes the browser upon' +
+          ' modification of HTML/CSS/JS files.')
+  .action(require('./commands/serve'));
 
 // fetch libraries
 program

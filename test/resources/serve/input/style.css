@@ -1,0 +1,54 @@
+body{font-size:15px;background:url("images/pattern.jpg") repeat}
+h1,h2,h3,h4,h5,h6{font-weight:normal;margin-bottom:10px}
+h2{font-size:20px}
+header{margin-bottom:40px;margin-top:5px}
+header h1{font:60px "Brush Script MT";text-shadow:1px 1px #fff;margin-bottom:15px}
+#intro{float:left}
+#station{position:relative;margin-top:-10px}
+#station input,#my-name input{width:120px;padding:7px 10px;margin:-2px 5px 0}
+#my-name input{width:140px}
+.tooltip{font-size:75%}
+#my-name{float:right;margin-top:25px}
+#boosts{margin-top:20px}
+.boost{position:relative;float:left;margin-right:35px}
+.boost.last{margin-right:0}
+.boost.inactive .close-link{display:none}
+.boost-img img{width:120px;height:120px;background:#ccc;margin-bottom:20px;-moz-box-shadow:1px 1px 2px #aaa;-webkit-box-shadow:1px 1px 2px #aaa;-khtml-box-shadow:1px 1px 2px #aaa;-ms-box-shadow:1px 1px 2px #aaa;-o-box-shadow:1px 1px 2px #aaa;box-shadow:1px 1px 2px #aaa;-moz-border-radius:5px;-webkit-border-radius:5px;-khtml-border-radius:5px;-ms-bordr-radius:5px;-o-border-radius:5px;border-radius:5px}
+.boost a.close-link{position:absolute;top:-12px;left:-12px}
+.boost a.close-link img{width:24px;height:24px;opacity:.4}
+.boost a.close-link:hover img{opacity:1}
+.sliderbar{margin-bottom:10px;width:auto}
+.noUi_midBar{background-color:#ee5f5b;background-image:none}
+#boost-button,#skip-button{margin-bottom:20px;text-align:center}
+#boost-button i,#skip-button i{margin-left:5px}
+#album-art{display:block;width:200px;height:200px;background:#ccc;margin-left:auto;margin-right:auto;-moz-box-shadow:1px 1px 2px #aaa;-webkit-box-shadow:1px 1px 2px #aaa;-khtml-box-shadow:1px 1px 2px #aaa;-ms-box-shadow:1px 1px 2px #aaa;-o-box-shadow:1px 1px 2px #aaa;box-shadow:1px 1px 2px #aaa;-moz-border-radius:5px;-webkit-border-radius:5px;-khtml-border-radius:5px;-ms-bordr-radius:5px;-o-border-radius:5px;border-radius:5px}
+#play-progress-container{width:200px;height:10px;-moz-border-radius:5px;-webkit-border-radius:5px;-khtml-border-radius:5px;-ms-bordr-radius:5px;-o-border-radius:5px;border-radius:5px;margin-left:auto;margin-right:auto;margin-top:5px;background:#ccc}
+#rate{float:left;width:50px;text-align:center}
+#visuals{float:left;margin-left:35px}
+.rating{width:32px;height:32px;margin-bottom:20px;margin-left:auto;margin-right:auto;display:block;opacity:.4;cursor:pointer}
+.rating:hover{opacity:.6}
+.rating.active{opacity:1}
+#search{margin-bottom:20px;position:relative}
+#search label{float:left;padding-top:7px;margin-right:10px}
+#search input{float:left;padding:7px 10px;width:230px}
+#search ul,#station ul{position:absolute;top:34px;left:44px;margin-left:0;background:#fff;width:250px;font-size:13px;color:#000;background-color:rgba(255,255,255,0.8);-moz-box-shadow:1px 1px 3px #999;-webkit-box-shadow:1px 1px 3px #999;-khtml-box-shadow:1px 1px 3px #999;-ms-box-shadow:1px 1px 3px #999;-o-box-shadow:1px 1px 3px #999;box-shadow:1px 1px 3px #999;-moz-border-radius:5px;-webkit-border-radius:5px;-khtml-border-radius:5px;-ms-bordr-radius:5px;-o-border-radius:5px;border-radius:5px;z-index:100}
+#station ul{top:32px;left:110px;text-align:left}
+#search li,#station li{list-style-type:none;border-bottom:#eee;padding:5px 5px;margin:0 0 0 0;padding:5px 12px;background-color:transparent;border:1px solid #fff;border-bottom:1px solid #ddd;cursor:pointer}
+#search li.missing-spotify-id,#station li.missing-spotify-id{color:#ccc}
+#search li.active,#station li.active{background-color:#3668d9;background-image:-webkit-gradient(linear,0% 0%,0% 64%,from(#6e81f5),to(#3e52f2));border-color:#3342e8;color:#fff;text-shadow:0 1px 2px #122042}
+#search li.active.missing-spotify-id,#station li.active.missing-spotify-id{color:#3342e8}
+#song,#artist,#album{font-size:120%;padding-bottom:7px;margin-bottom:10px;border-bottom:1px solid #ccc;text-shadow:1px 1px #fff;-moz-box-shadow:0 3px 3px -3px #ccc;-webkit-box-shadow:0 3px 3px -3px #ccc;-khtml-box-shadow:0 3px 3px -3px #ccc;-ms-box-shadow:0 3px 3px -3px #ccc;-o-box-shadow:0 3px 3px -3px #ccc;box-shadow:0 3px 3px -3px #ccc;line-height:1.2}
+#song .heading,#artist .heading,#album .heading{display:block;color:#999;font-size:80%;padding-bottom:7px;font-family:Georgia,Cambria,"Times New Roman",Times,Serif}
+.row{float:left}
+#sidebar{float:right}
+#user-list,#message-list{max-height:250px;overflow:auto}
+#user-list li,#message-list li{overflow:hidden;list-style-type:none;line-height:1.5;padding:7px 0;border-bottom:1px dotted #bbb}
+#user-list li:nth-child(2n),#message-list li:nth-child(2n){background:rgba(255,255,255,0.15)}
+#user-list span{float:left}
+#user-list .boost-icons{float:right}
+#user-list .boost-icons img{float:left;margin-left:10px;width:24px;height:24px}
+#message-list i{margin-top:1px}
+.popover-title{margin-bottom:0}
+.popover-content{font-size:13px}
+footer{clear:both}
+footer p{padding-top:20px;color:#999}

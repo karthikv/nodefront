@@ -6,7 +6,6 @@ var utils = require('../lib/utils');
 var libraries = require('../libraries.json');
 var sandboxedModule = require('sandboxed-module');
 
-var nodefront = __dirname + '/../nodefront.js';
 var outputDir = __dirname + '/resources/fetch/output';
 var expectedDir = __dirname + '/resources/fetch/expected';
 

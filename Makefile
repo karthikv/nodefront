@@ -13,4 +13,7 @@ test-insert:
 test-compile:
 	@./node_modules/.bin/mocha test/test.compile.js --reporter list
 
+test-serve:
+	@./node_modules/.bin/mocha test/test.serve.js --reporter list
+
 .PHONY: test

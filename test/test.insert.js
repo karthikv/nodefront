@@ -1,7 +1,6 @@
 var utils = require('../lib/utils');
 var testUtils = require('./lib/utils');
 
-var nodefront = __dirname + '/../nodefront.js';
 var inputDir = __dirname + '/resources/insert/input';
 var expectedDir = __dirname + '/resources/insert/expected';
 

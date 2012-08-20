@@ -1,7 +1,6 @@
 var fs = require('fs');
 var q = require('q');
 var pathLib = require('path');
-var urlLib = require('url');
 var build = require('consolidate-build');
 var utils = require('../lib/utils');
 
@@ -65,66 +64,10 @@ var rStylusInclude = /^[ \t]*@import[ \t]+([^\n]+)/gm;
  *  layout.jade includes index.jade, when index.jade is modified, both
  *  index.jade and layout.jade are recompiled. This is referred to as
  *  "dependency-intelligent" recompilation
- *
- *  If the -s/--serve <port> flag is specified, the files in the current
- *  directory are served on localhost at the given port number, which
- *  defaults to 3000.
- *
- *  If the -l/--live <port> flag is specified, -w/--watch and -s/--serve <port>
- *  are implied. Not only are files recompiled upon modification, but the
- *  browser is also automatically updated when corresponding HTML/CSS/JS/Jade/
- *  Stylus files are altered. In the case of CSS/Stylus, link tags on the page
- *  are simply removed and re-added. For HTML/JS/Jade, the browser is refreshed
- *  entirely.
  *  
  * @param shouldPromise - if true, returns a promise that yields completion
  */
 module.exports = exports = function(env, shouldPromise) {
-  var server;
-  var io;
-
-  if (env.serve || env.live) {
-    // default to serving the files on localhost
-    env.hostname = env.hostname || '127.0.0.1';
-
-    // serve and live default to boolean options, but can be numeric if a port
-    // is provided; check for this and serve the files accordingly
-    if (typeof env.serve === 'number' || typeof env.live === 'number') {
-      server = serveFilesLocally(env.serve || env.live, env.hostname, env.live);
-    } else {
-      server = serveFilesLocally(3000, env.hostname, env.live);
-    }
-  }
-
-  if (env.live) {
-    // initiate the socket connection
-    io = require('socket.io').listen(server);
-
-    io.sockets.on('connection', function(socket) {
-      socket.on('resolvePaths', function(paths) {
-        var resolvedPaths = [];
-        var absPath;
-
-        // use path library to resolve paths
-        resolvedPaths[0] = pathLib.resolve('.' + paths[0]);
-        resolvedPaths[1] = {};
-        resolvedPaths[2] = {};
-
-        // resolve each path in the latter two arrays, keeping track of the new
-        // path and original in a map of new => original
-        for (var i = 1; i <= 2; i++) {
-          for (var j = 0; j < paths[i].length; j++) {
-            absPath = pathLib.resolve('.' + paths[i][j]);
-            resolvedPaths[i][absPath] = paths[i][j];
-          }
-        }
-
-        // let the client know
-        socket.emit('pathsResolved', resolvedPaths);
-      });
-    });
-  }
-
   var promise = findFilesToCompile(env.recursive)
     .then(function(compileData) {
       var promises = [];
@@ -140,11 +83,11 @@ module.exports = exports = function(env, shouldPromise) {
 
         // compile the current file and record this function
         var compileFn = generateCompileFn(fileNameSansExtension, extension,
-            contents, env.live);
+            contents);
         compileFns[fileName] = compileFn;
         promises.push(compileFn());
 
-        if (env.watch || env.live) {
+        if (env.watch) {
           // record dependencies for dependency-intelligent recompilation
           recordDependencies(fileName, extension, contents);
           recompileUponModification(fileName, extension, io);
@@ -159,132 +102,7 @@ module.exports = exports = function(env, shouldPromise) {
   } else {
     promise.end();
   }
-
-  if (env.live) {
-    // communicate to client whenever file is modified
-    trackModificationsLive(io, env.recursive);
-  }
 };
-
-/**
- * Function: trackModificationsLive
- * --------------------------------
- * Watch all HTML, CSS, and JS files for modifications. Emit a fileModified
- * event to the client upon modification to allow for live refreshes.
- *
- * @param io - socket.io connection if this is live mode
- * @param recursive - true to watch all files in subdirectories as well
- */
-function trackModificationsLive(io, recursive) {
-  utils.readDirWithFilter('.', true, /\.(html|css|js)$/, true)
-    .then(function(files) {
-      files.forEach(function(fileName) {
-        // use a small interval for quick live refreshes
-        utils.watchFileForModification(fileName, 200, function() {
-          io.sockets.emit('fileModified', fileName);
-        });
-      });
-    });
-}
-
-/**
- * Function: serveFilesLocally
- * ---------------------------
- * Serves the files in the current directory on localhost at the given port
- * number.
- *
- * @param port - the port number to serve the files on
- * @param hostname - the hostname to serve the files on
- * @param live - true if this is live mode
- *
- * @return the node HTTP server
- */
-function serveFilesLocally(port, hostname, live) {
-  var http = require('http');
-  var mime = require('mime');
-
-  if (live) {
-    // scripts to dynamically insert into html pages
-    var scripts = '<script src="/socket.io/socket.io.js"></script>' +
-      '<script src="/nodefront/live.js"></script>';
-  }
-
-  var server = http.createServer(function(request, response) {
-    /**
-     * Function: respondWith404
-     * ------------------------
-     * Responds with a 404 not found error and a 'File not found.' message.
-     */
-    function respondWith404() {
-      response.writeHead(404, {'Content-Type': 'text/plain'});
-      response.end('File not found.');
-    }
-
-    if (request.method == 'GET') {
-      var urlParts = urlLib.parse(request.url);
-      // file path in current directory
-      var path = '.' + urlParts.pathname;
-
-      // redirect /nodefront/live.js request to nodefront's live.js
-      if (live && path === './nodefront/live.js') {
-        path = pathLib.resolve(__dirname + '/../live.js');
-      }
-
-      q.ncall(fs.stat, fs, path)
-        .then(function(stats) {
-          // if this is a directory, assume user wants to serve index.html
-          if (stats.isDirectory()) {
-            if (path[path.length - 1] !== '/') {
-              // redirect to url with an ending slash to signify this is
-              // a directory
-              urlParts.pathname += '/';
-              response.writeHead(301, {'Location': urlLib.format(urlParts)});
-
-              response.end();
-              return;
-            }
-
-            path += 'index.html';
-          }
-
-          var mimeType = mime.lookup(path, 'text/plain');
-          var charset = mime.charsets.lookup(mimeType, '');
-          var binary = charset !== 'UTF-8';
-
-          // if file exists, serve it; otherwise, return a 404
-          utils.readFile(path, binary)
-            .then(function(contents) {
-              // find this file's mime type or default to text/plain
-              response.writeHead(200, {'Content-Type': mimeType});
-
-              if (live && mimeType === 'text/html') {
-                // add scripts before end body tag
-                contents = contents.replace('</body>', scripts + '</body>');
-
-                // if no end body tag is present, just append scripts
-                if (contents.indexOf(scripts) === -1) {
-                  contents = contents + scripts;
-                }
-              }
-
-              if (binary) {
-                response.end(contents, 'binary');
-              } else {
-                response.end(contents);
-              }
-            }, respondWith404)
-            .end();
-        }, respondWith404);
-    } else {
-      // bad request error code
-      response.writeHead(400, {'Content-Type': 'text/plain'});
-      response.end('Unsupported request type.');
-    }
-  }).listen(port, hostname);
-
-  console.log('Serving your files at http://' + hostname + ':' + port + '/.');
-  return server;
-}
 
 /**
  * Function: recompileUponModification
@@ -391,11 +209,10 @@ function recordDependencies(fileName, extension, contents) {
  *
  * @param fileNameSansExtension - file name without extension
  * @param extension - the extension of the file name
- * @param live - true if this is live mode
  *
  * @return function to compile this file that takes no parameters
  */
-function generateCompileFn(fileNameSansExtension, extension, live) {
+function generateCompileFn(fileNameSansExtension, extension) {
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
     // always default to compressing files
@@ -415,8 +232,8 @@ function generateCompileFn(fileNameSansExtension, extension, live) {
           });
       })
       .fail(function(error) {
-        // if a compilation error occurs, don't end the program, as this may be
-        // serve/live mode; simply print the error out
+        // if a compilation error occurs, don't end the program; simply notify
+        // the user of the issue
         console.error(error.message);
       });
   };
