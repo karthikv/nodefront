@@ -1,6 +1,7 @@
 var fs = require('fs');
 var q = require('q');
 var pathLib = require('path');
+var urlLib = require('url');
 var build = require('consolidate-build');
 var utils = require('../lib/utils');
 
@@ -220,8 +221,9 @@ function serveFilesLocally(port, hostname, live) {
     }
 
     if (request.method == 'GET') {
+      var urlParts = urlLib.parse(request.url);
       // file path in current directory
-      var path = '.' + request.url.split('?')[0];
+      var path = '.' + urlParts.pathname;
 
       // redirect /nodefront/live.js request to nodefront's live.js
       if (live && path === './nodefront/live.js') {
@@ -230,11 +232,18 @@ function serveFilesLocally(port, hostname, live) {
 
       q.ncall(fs.stat, fs, path)
         .then(function(stats) {
+          // if this is a directory, assume user wants to serve index.html
           if (stats.isDirectory()) {
-            // if this is a directory, assume user wants to serve index.html
             if (path[path.length - 1] !== '/') {
-              path += '/';
+              // redirect to url with an ending slash to signify this is
+              // a directory
+              urlParts.pathname += '/';
+              response.writeHead(301, {'Location': urlLib.format(urlParts)});
+
+              response.end();
+              return;
             }
+
             path += 'index.html';
           }
 
