@@ -1,4 +1,10 @@
 
+0.1.1 / 2012-08-19 
+==================
+
+  * Make index.html short URLs end with a slash, as they represent directories.
+  * Make compile live mode work with index.html files. Addresses issue #10.
+
 0.1.0 / 2012-08-17 
 ==================
 
