@@ -18,18 +18,28 @@ exports.expectFilesToMatch = function(fileNameA, fileNameB) {
   var expected = utils.readFile(fileNameA);
   var actual = utils.readFile(fileNameB);
 
+  return exports.expectResultsToMatch(expected, actual);
+};
+
+/**
+ * Function: expectResultsToMatch
+ * ------------------------------
+ * Expects the results of the two given promises to match.
+ *
+ * @param expected - the first promise for a string or a string
+ * @param actual - the second promise for a string or a string
+ * 
+ * @return promise that yields success if the results match or an error
+ *  otherwise
+ */
+exports.expectResultsToMatch = function(expected, actual) {
   return q.all([expected, actual])
     .spread(function(expected, actual) {
       // make line-endings consistent
-      actual = actual.replace('\r\n', '\n');
-      expected = expected.replace('\r\n', '\n');
+      actual = actual.replace(/\r\n/g, '\n');
+      expected = expected.replace(/\r\n/g, '\n');
 
-      try {
-        actual.should.equal(expected);
-      } catch (error) {
-        // don't print out contents and expected because they are too large
-        throw new Error("Contents don't match expected.");
-      }
+      actual.should.equal(expected);
     });
 };
 
