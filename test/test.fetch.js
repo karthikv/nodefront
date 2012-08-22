@@ -3,6 +3,7 @@ var urlLib = require('url');
 var q = require('q');
 var should = require('should');
 var utils = require('../lib/utils');
+var testUtils = require('./lib/utils');
 var libraries = require('../libraries.json');
 var sandboxedModule = require('sandboxed-module');
 
@@ -257,16 +258,10 @@ describe('`nodefront fetch`', function() {
     version = version || library.latest;
     var fileName = libraryName + '-' + version + '.' + extension;
 
-    // read contents of both input and expected
-    return utils.readFile(outputDir + '/' + fileName)
-      .then(function(contents) {
-        // compare and clean up
-        try {
-          contents.should.equal(expected);
-        } catch (error) {
-          // don't print out contents and expected because they are too large
-          throw new Error("Contents don't match expected.");
-        }
+    var actual = utils.readFile(outputDir + '/' + fileName);
+
+    return testUtils.expectResultsToMatch(expected, actual)
+      .then(function() {
         return q.ncall(fs.unlink, fs, outputDir + '/' + fileName);
       });
   }
