@@ -4,7 +4,7 @@ var request = require('request');
 var libraries = require('nconf');
 var q = require('q');
 var program = require('commander');
-var Zip = require('adm-zip');
+var JSZip = require('node-zip');
 var minifyCommand = require('./minify');
 var utils = require('../lib/utils');
 
@@ -122,39 +122,24 @@ module.exports = exports = function(libraryName, env, omitSave,
 
     promise = downloadFile(url, toFileName)
       .then(function() {
+        return utils.readFile(toFileName, true);
+      })
+      .then(function(buffer) {
         var pathRegex = new RegExp(path);
-        var zip;
-        var entries;
-        var foundPath = false;
+        var zip = new JSZip(buffer.toString('base64'), { base64: true });
 
-        try {
-          zip = new Zip(toFileName);
-          entries = zip.getEntries();
-        } catch (error) {
-          // error thrown is not an error object and q can't handle that well;
-          // convert it here
-          throw new Error(error);
-        }
+        var files = zip.filter(function(path, file) {
+          return !file.options.dir && pathRegex.test(path);
+        });
 
-        // find the path that matches the regular expression
-        for (var i = 0; i < entries.length; i++) {
-          if (pathRegex.test(entries[i].entryName)) {
-            foundPath = true;
-            console.log('Matched path ' + entries[i].entryName);
-
-            outputFileData(zip.readAsText(entries[i]), libraryName, fileName,
-              dirName);
-
-            if (minify) {
-              return minifyFetchedFile(dirName, fileName);
-            }
-
-            break;
-          }
-        }
-
-        if (!foundPath) {
+        if (files.length === 0) {
           console.error('The path you specified could not be found.');
+        } else {
+          outputFileData(files[0].data, libraryName, fileName, dirName);
+
+          if (minify) {
+            return minifyFetchedFile(dirName, fileName);
+          }
         }
       })
       .fin(function() {
@@ -247,23 +232,21 @@ function runInteractiveSession(libraryName, env) {
                     'archive is the library you are looking for. Please\n' +
                     'choose from the list below.\n');
 
-        return downloadFile(url, 'nodefront-' + libraryName + '-zip')
+        var toFileName = 'nodefront-' + libraryName + '-zip';
+        return downloadFile(url, toFileName)
           .then(function(toFileName) {
-            var zip;
-            var entries;
-
-            try {
-              zip = new Zip(toFileName);
-              entries = zip.getEntries();
-            } catch (error) {
-              // error thrown is not an error object and q can't handle that well;
-              // convert it here
-              throw new Error(error);
-            }
+            return utils.readFile(toFileName, true);
+          })
+          .then(function(buffer) {
+            var zip = new JSZip(buffer.toString('base64'), { base64: true });
+            var files = zip.filter(function(path, file) {
+              return !file.options.dir;
+            });
 
             fs.unlinkSync(toFileName);
-            return entries.map(function(entry) {
-              return entry.entryName;
+            // map files to just name
+            return files.map(function(file) {
+              return file.name;
             });
           })
           .then(function(entries) {
@@ -352,7 +335,7 @@ function outputFileData(data, libraryName, fileName, dirName) {
   }
 
   fs.writeFileSync(dirName + fileName, data);
-  console.log('Fetched ' + libraryName + ' into ' + dirDisplay + fileName + '.');
+  console.log('Fetched ' + libraryName + ' into ' + dirDisplay + '/' + fileName + '.');
 }
 
 /**
