@@ -48,6 +48,11 @@ var utils = require('../lib/utils');
      // initiate the socket connection
      io = require('socket.io').listen(server);
 
+     // logging is unnecessary
+     io.configure(function() {
+       io.disable('log');
+     });
+
      io.sockets.on('connection', function(socket) {
        socket.on('resolvePaths', function(paths) {
          var resolvedPaths = [];

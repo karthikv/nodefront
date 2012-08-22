@@ -104,8 +104,6 @@
       scriptSources[scriptSource] = scriptSources[origSource];
       delete scriptSources[origSource];
     }
-
-    console.log(currentFilePath, linkSources, scriptSources);
   });
 
   socket.on('fileModified', function(filePath) {
