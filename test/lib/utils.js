@@ -8,15 +8,15 @@ var q = require('q');
  * ----------------------------
  * Expects the contents of the two given files to match.
  *
- * @param fileNameA - the first file
- * @param fileNameB - the second file
+ * @param expectedFileName - the file with the expected contents
+ * @param actualFileName - the file with the actual contents
  * 
  * @return promise that yields success if the contents match or an error
  *  otherwise
  */
-exports.expectFilesToMatch = function(fileNameA, fileNameB) {
-  var expected = utils.readFile(fileNameA);
-  var actual = utils.readFile(fileNameB);
+exports.expectFilesToMatch = function(expectedFileName, actualFileName) {
+  var expected = utils.readFile(expectedFileName);
+  var actual = utils.readFile(actualFileName);
 
   return exports.expectResultsToMatch(expected, actual);
 };
