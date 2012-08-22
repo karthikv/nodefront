@@ -113,14 +113,14 @@ describe('`nodefront minify`', function() {
   });
 
   it('optimizes JPG images', function(done) {
-    minify('images/book.jpg$', defaultEnv, true)
+    minify('images/rectangle.jpg$', defaultEnv, true)
       .then(function() {
-        return testUtils.expectFilesToMatch(inputDir + '/images/book.min.jpg',
-          expectedDir + '/images/book.min.jpg');
+        return testUtils.expectFilesToMatch(inputDir + '/images/rectangle.min.jpg',
+          expectedDir + '/images/rectangle.min.jpg');
       })
       .fin(function() {
         try {
-          fs.unlinkSync(inputDir + '/images/book.min.jpg');
+          fs.unlinkSync(inputDir + '/images/rectangle.min.jpg');
         } catch (error) {
           // don't worry about this; there was likely an error earlier
         }
