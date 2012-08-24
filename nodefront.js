@@ -95,7 +95,9 @@ program
   .action(require('./commands/minify'));
 
 program.parse(process.argv);
+
 if (process.argv.length === 2) {
   // no arguments were provided; output the help
-  program.outputHelp();
+  process.stdout.write(program.helpInformation());
+  program.emit('--help');
 }
