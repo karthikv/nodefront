@@ -130,7 +130,9 @@ function recompileUponModification(fileName, extension) {
 
         // compile all files that depend on this one
         for (var dependentFile in dependents[fileName]) {
-          console.log('Compiling dependent:', dependentFile);
+          var dependentDisplay = pathLib.relative('.', dependentFile);
+          console.log('Compiling dependent ' + dependentDisplay + '.');
+
           if (compileFns[dependentFile]) {
             compileFns[dependentFile]()
               .end();
