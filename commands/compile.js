@@ -215,6 +215,7 @@ function recordDependencies(fileName, extension, contents) {
 function generateCompileFn(fileNameSansExtension, extension) {
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
+    var fileDisplay = pathLib.relative('.', fileName);
     // always default to compressing files
     var options = { compress: true };
 
@@ -234,7 +235,8 @@ function generateCompileFn(fileNameSansExtension, extension) {
       .fail(function(error) {
         // if a compilation error occurs, don't end the program; simply notify
         // the user of the issue
-        console.error(error.message);
+        console.error('Compilation error for ' + fileDisplay + ':',
+          error.message);
       });
   };
 }
