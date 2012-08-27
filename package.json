@@ -13,6 +13,7 @@
   "dependencies": {
     "coffee-script": "1.3.x",
     "commander": "1.0.x",
+    "commander-config": "0.x.x",
     "consolidate-build": "0.x.x",
     "jade": "0.26.x",
     "mime": "1.2.x",
