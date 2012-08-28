@@ -18,7 +18,7 @@ program
   .option('-r, --recursive', 'Recurse through directories.')
   .option('-w, --watch', 'Recompile files upon modification. Intelligently' +
     ' recompile dependencies.')
-  .action(config.withSettings('./.nf/compile', require('./commands/compile')));
+  .action(config.withSettings('.nf/compile', require('./commands/compile')));
 
 // serve files
 program
@@ -29,7 +29,7 @@ program
           ' simultaneousy')
   .option('-l, --live', 'Automatically refreshes the browser upon' +
           ' modification of HTML/CSS/JS files.')
-  .action(config.withSettings('./.nf/serve', require('./commands/serve')));
+  .action(config.withSettings('.nf/serve', require('./commands/serve')));
 
 // fetch libraries
 program
@@ -48,7 +48,7 @@ program
           'be its extension. This defaults to js.', String, 'js')
   .option('-m, --minify', 'Minify the fetched file.')
   .option('-i, --interactive', 'Interactively add a new library and fetch it.')
-  .action(config.withSettings('./.nf/fetch', require('./commands/fetch')));
+  .action(config.withSettings('.nf/fetch', require('./commands/fetch')));
 
 // insert CSS/JS libraries into HTML/Jade documents
 program
@@ -65,7 +65,7 @@ program
           ' are used, specify -1 for this option. Otherwise, if this is not' +
           ' given, the tab length is assumed to be 4.', Number, 4)
   .option('-d, --delete', 'Delete <library> from <file>.')
-  .action(config.withSettings('./.nf/insert', require('./commands/insert')));
+  .action(config.withSettings('.nf/insert', require('./commands/insert')));
 
 // minify CSS/JS and optimize images
 program
@@ -93,7 +93,7 @@ program
   .option('-i, --images', 'Shortcut to optimize all JPEG/PNG files.')
   .option('-p, --plain', 'Switch to plain text mode, where [fileRegex] is no' +
           ' longer a regular expression, but just the path to a file.')
-  .action(config.withSettings('./.nf/insert', require('./commands/minify')));
+  .action(config.withSettings('.nf/insert', require('./commands/minify')));
 
 program.parse(process.argv);
 

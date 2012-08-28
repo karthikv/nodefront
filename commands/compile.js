@@ -83,7 +83,7 @@ module.exports = exports = function(env, shouldPromise) {
 
         // compile the current file and record this function
         var compileFn = generateCompileFn(fileNameSansExtension, extension,
-            contents);
+            env.compilerOptions);
         compileFns[fileName] = compileFn;
         promises.push(compileFn());
 
@@ -211,15 +211,19 @@ function recordDependencies(fileName, extension, contents) {
  *
  * @param fileNameSansExtension - file name without extension
  * @param extension - the extension of the file name
+ * @param compilerOptions - options to pass to the compiler for this file
  *
  * @return function to compile this file that takes no parameters
  */
-function generateCompileFn(fileNameSansExtension, extension) {
+function generateCompileFn(fileNameSansExtension, extension, compilerOptions) {
+  compilerOptions = compilerOptions || {};
+
   return function() {
     var fileName = fileNameSansExtension + '.' + extension;
     var fileDisplay = pathLib.relative('.', fileName);
-    // always default to compressing files
-    var options = { compress: true };
+
+    // clone compiler options to circumvent modifications from build call
+    var options = utils.extend({}, compilerOptions);
 
     // consolidate-build will take care of picking which compiler to use;
     // simply use the file extension as a key
