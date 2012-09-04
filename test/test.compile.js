@@ -89,10 +89,11 @@ describe('`nodefront compile`', function() {
 
   describe('compiles', function() {
     before(function(done) {
+      this.timeout(5000);
       compile(defaultEnv, true)
         .then(function() {
           done();
-        })
+        }, done)
         .end();
     });
 
