@@ -227,7 +227,7 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions) {
 
     // consolidate-build will take care of picking which compiler to use;
     // simply use the file extension as a key
-    return q.ncall(build[extension], build[extension], fileName, options)
+    return q.ncall(utils.autoLoad(build[extension]), build[extension], fileName, options)
       .then(function(output) {
         var newExtension = compiledExtensions[extension];
         var compiledFileName = fileNameSansExtension + '.' + newExtension;
