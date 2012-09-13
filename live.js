@@ -11,7 +11,7 @@
     location.pathname.lastIndexOf('/'));
 
   // socket communication
-  var socket = io.connect('http://localhost:' + location.port);
+  var socket = io.connect();
 
   // link tag information
   var linkTags = document.querySelectorAll('link');
