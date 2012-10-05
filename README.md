@@ -159,8 +159,8 @@ If the directory structure looks like:
 
 Running `nodefront serve` in the directory with no options would allow you to access the three files above using the following URLs:
 
-http://localhost:3000/index.html would serve ./index.html
-http://localhost:3000/css/styles.css would serve ./css/styles.css
+http://localhost:3000/index.html would serve ./index.html  
+http://localhost:3000/css/styles.css would serve ./css/styles.css  
 http://localhost:3000/css/script.js would serve ./js/script.js
 
 ### Options
