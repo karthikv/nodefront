@@ -1,4 +1,24 @@
 
+1.0.0 / 2012-10-04 
+==================
+
+  * Use auto-discovery mode for socket connection to allow live reloading on mobile.
+  * Add options for compilation by means of the compilerOptions parameter. Addresses issue #21.
+  * Enable configuration files for commands. These are located at `.nf/[command].(json|yml|yaml)` anywhere in the directory tree.
+  * Display compile dependencies using a relative path.
+  * Make compilation errors more descriptive. Addresses issue #19.
+  * When run with no arguments, fix bug in printing help due to new commander dependency. Addresses issue #18.
+  * Switch commander dependency from git repository to package in npm.
+  * Disable socket.io logging. Addresses issue #17.
+  * Change generic file names in tests to expected and actual for clarity.
+  * Make line endings consistent for tests.
+  * Cut down on size of fetch resources. Switch to node-zip library.
+  * Reduce size of resources to speed up tests and allow for displaying differences. Addresses issue #16.
+  * Make versions more flexible, especially for development dependencies. Addresses issue #15.
+  * Replace Makefile with npm commands for more OS compatibility.
+  * Add tests for compile watch mode.
+  * Split compile serve and live mode to separate serve command. Add zombie.js tests for live mode.
+
 0.1.1 / 2012-08-19 
 ==================
 

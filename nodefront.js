@@ -26,7 +26,7 @@ program
   .description('Serves files on the given hostname and port, defaulting to' +
                ' localhost:3000.')
   .option('-c, --compile', 'Shortcut to run nodefront compile -w/--watch' +
-          ' simultaneousy')
+          ' simultaneously')
   .option('-l, --live', 'Automatically refreshes the browser upon' +
           ' modification of HTML/CSS/JS files.')
   .action(config.withSettings('.nf/serve', require('./commands/serve')));

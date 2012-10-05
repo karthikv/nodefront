@@ -31,7 +31,9 @@ Before diving into the documentation, you may view a [screencast that introduces
 
 ## Command Summary
 
-Compile: `nodefront compile` - Compiles a variety of templating and built languages (see compile command below), including, by default, Jade, Stylus, and CoffeeScript. Can compile upon modification, serve files on localhost, and even automatically refresh the browser/styles when files are changed.
+Compile: `nodefront compile` - Compiles a variety of templating and built languages (see compile command below), including, by default, Jade, Stylus, and CoffeeScript. Can compile upon modification.
+
+Serve: `nodefront serve` - Serve files on localhost. Automatically refresh the browser/styles when files are changed.
 
 Fetch: `nodefront fetch` - Automatically fetches CSS/JS libraries for use in your project. Provides an interactive mode to add new libraries.
 
@@ -109,14 +111,6 @@ Recursive: `nodefront compile -r/--recursive` recurses through sub-directories i
 
 Watch: `nodefront compile -w/--watch` watches all files that can be compiled in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
 
-Serve: `nodefront compile -s/--serve [port]` creates a `localhost` server via node.js that serves all files in the current directory and any subdirectories. By default, this server is created on port 3000, but this is modifiable via the [port] option. For example, `nodefront --serve 5387` will serve nodefront on port 5387.
-
-Live: `nodefront compile -l/--live [port]` mimics the serve option (see above) with some added file watching features. For each HTML page that is served to the browser, all of its file dependencies, including the source itself, its CSS styles, and its scripts, are monitored for changes. If the source itself or one of its scripts changes, the browser will automatically refresh. If a CSS stylesheet is modified, it is reloaded without refreshing via a cache-busting query string. This allows for live development with immediate feedback and circumvents the need to keep reloading the browser manually.
-
-For those who are interested in the more technical aspects of the live command, the `localhost` server that it creates automatically injects web socket code, courtesy of socket.io, into HTML pages. This allows communication between the client and the node.js server. Whenever a file is modified, the server notifies the client via the established socket connection. The client then assesses whether this file affects the current page and takes appropriate actions.
-
-Hostname: `nodefront compile -n/--hostname [hostname]` sets which hostname to serve files on. This must be used in conjunction with the live or serve option (see above). If not specified, live or serve defaults to serving files on localhost.
-
 ### Markdown Support
 If you'd like markdown support for Jade, simply install the [marked](https://github.com/chjj/marked) library, like so:
 
@@ -125,6 +119,56 @@ $ npm install -g marked
 ```
 
 Jade should automatically interface with it.
+
+### Configuration Files
+Language compilers often come with a variety of options. For example, Jade has the option of compressing HTML upon compilation. Nodefront allows you to set these options via configuration files. To do so, simply create a `.nf` directory anywhere in your project tree. This means that `.nf` can be present directly in your project directory or in any of its parent directories. Then, add a `compile.json` or `compile.yml` file with a `compilerOptions` map. Any key-value pairs you add to this map will be passed on to the compiler. For example, to tell Jade to output pretty HTML instead of compressing it, you can use the following `.nf/compile.json` file:
+
+```json
+{
+    "compilerOptions": {
+        "pretty": true
+    }
+}
+```
+
+The YAML equivalent, `.nf/compile.yml`, would look like:
+
+```yml
+compilerOptions:
+    pretty: true
+```
+
+## Serve Command
+### Usage
+
+```bash
+$ nodefront serve [options] [port] [hostname]
+```
+
+The serve command will serve all static files in the current directory and subdirectories on a local Node.js server. The current directory will act as the effective root of the server. Files will be accessible by the URL http://[hostname]:[port]/[path], where [path] is the path to the file relative to the current directory. [hostname] and [port] are provided as explicit parameters on the command-line and default to localhost and 3000, respectively.
+
+### Example
+If the directory structure looks like:
+
+    .
+    |_ index.html
+    |_ css
+      `_ styles.css
+    |_ js
+      `_ script.js
+
+Running `nodefront serve` in the directory with no options would allow you to access the three files above using the following URLs:
+
+http://localhost:3000/index.html would serve ./index.html
+http://localhost:3000/css/styles.css would serve ./css/styles.css
+http://localhost:3000/css/script.js would serve ./js/script.js
+
+### Options
+Compile: `nodefront serve -c/--compile` will run `nodefront compile -w/--watch` simultaneously. This allows you to modify files that need to be compiled and immediately see the updates in your browser.
+
+Live: `nodefront serve -l/--live` will monitor each HTML page that is served to the browser and all of its CSS/JS dependencies. If the page's source itself or one of its scripts changes, the browser will automatically refresh. If a CSS stylesheet is modified, it will be reloaded without refreshing via a cache-busting query string. This allows for live development with immediate feedback and circumvents the need to keep reloading the browser manually.
+
+For those who are interested in the more technical aspects of live mode, the server that is created automatically injects web socket code, courtesy of socket.io, into HTML pages. This allows for communication between the client and the Node.js server. Whenever a file is modified, the server notifies the client via the established socket connection. The client then assesses whether this file affects the current page and takes appropriate actions.
 
 ## Fetch Command
 ### Usage
