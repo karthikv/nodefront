@@ -318,8 +318,7 @@ function minifyFetchedFile(dirName, fileName) {
 /**
  * Function: outputFileData
  * ------------------------
- * Given the data of a file to output, log it to the console or save it as the
- * given file name.
+ * Output the given data for a file to the provided file name.
  *
  * @param data - the data of a file
  * @param libraryName - the name of the library to print out to the user
