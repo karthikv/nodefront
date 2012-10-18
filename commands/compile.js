@@ -275,25 +275,23 @@ function findFilesToCompile(recursive) {
       var compileData = [];
       var numFiles = files.length;
 
-      files.forEach(function(file, index) {
+      // map each file to a promise that reads its contents for compilation
+      var contentPromises = files.map(function(file, index) {
         // extract extension and contents of current file
         var extensionLoc = file.lastIndexOf('.');
         var extension = file.substr(extensionLoc + 1);
 
-        q.ncall(fs.readFile, fs, file, 'utf8')
+        return q.ncall(fs.readFile, fs, file, 'utf8')
           .then(function(contents) {
             compileData.push([file.substr(0, extensionLoc),
                 extension, contents]);
-
-            // done? if so, resolve with compileData
-            if (index == numFiles - 1) {
-              deferred.resolve(compileData);
-            }
-          })
-          .end();
+          });
       });
 
-      return deferred.promise;
+      return q.all(contentPromises)
+        .then(function() {
+          return compileData;
+        });
     });
 }
 
