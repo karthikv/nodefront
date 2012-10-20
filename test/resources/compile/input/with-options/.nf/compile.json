@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jade": {
+      "pretty": true
+    },
+    "coffee": {
+      "bare": true
+    },
+    "styl": {
+      "compress": true
+    }
+  }
+}

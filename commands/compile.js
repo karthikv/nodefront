@@ -222,8 +222,11 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions) {
     var fileName = fileNameSansExtension + '.' + extension;
     var fileDisplay = pathLib.relative('.', fileName);
 
-    // clone compiler options to circumvent modifications from build call
-    var options = utils.extend({}, compilerOptions);
+    // use compiler options for this specific extension
+    var options = compilerOptions[extension] || {};
+    
+    // clone compiler options to circumvent modifications from build call;
+    options = utils.extend({}, options);
 
     // consolidate-build will take care of picking which compiler to use;
     // simply use the file extension as a key

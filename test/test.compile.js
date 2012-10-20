@@ -2,12 +2,19 @@ var fs = require('fs');
 var q = require('q');
 var request = require('request');
 var sandboxedModule = require('sandboxed-module');
+var config = require('commander-config');
 
 var utils = require('../lib/utils');
 var testUtils = require('./lib/utils');
 
 var inputDir = __dirname + '/resources/compile/input';
 var expectedDir = __dirname + '/resources/compile/expected';
+
+var inputDirWithoutOptions = inputDir + '/without-options';
+var inputDirWithOptions = inputDir + '/with-options';
+
+var expectedDirWithoutOptions = expectedDir + '/without-options';
+var expectedDirWithOptions = expectedDir + '/with-options';
 
 var compile = sandboxedModule.require('../commands/compile', {
   requires: {
@@ -20,7 +27,7 @@ var originalDir = process.cwd();
 
 describe('`nodefront compile`', function() {
   before(function() {
-    process.chdir(inputDir);
+    process.chdir(inputDirWithoutOptions);
   });
 
   after(function() {
@@ -31,25 +38,29 @@ describe('`nodefront compile`', function() {
    * Function: confirmFilesAreCompiled
    * ---------------------------------
    * Creates tests to confirm that Jade, Stylus, and CoffeeScript files
-   * were compiled successfully to HTML, CSS, and JS, respectively.
+   * are compiled successfully to HTML, CSS, and JS, respectively.
+   *
+   * @param inputFilesDir -- the directory to find input files in
+   * @param expectedFilesDir -- the directory to find expected, compiled files
+   *  for comparsion
    */
-  function confirmFilesAreCompiled() {
+  function confirmFilesAreCompiled(inputFilesDir, expectedFilesDir) {
     it('Jade files', function(done) {
-      testUtils.expectFilesToMatch(inputDir + '/index.html',
-        expectedDir + '/index.html')
+      testUtils.expectFilesToMatch(inputFilesDir + '/index.html',
+        expectedFilesDir + '/index.html')
         .then(function() {
-          return testUtils.expectFilesToMatch(inputDir + '/layout.html',
-            expectedDir + '/layout.html');
+          return testUtils.expectFilesToMatch(inputFilesDir + '/layout.html',
+            expectedFilesDir + '/layout.html');
         })
         .fin(function() {
           try {
-            fs.unlinkSync(inputDir + '/index.html');
+            fs.unlinkSync(inputFilesDir + '/index.html');
           } catch (error) {
             // don't worry about this; an error probably occurred above
           }
 
           try {
-            fs.unlinkSync(inputDir + '/layout.html');
+            fs.unlinkSync(inputFilesDir + '/layout.html');
           } catch (error) {
             // don't worry about this; an error probably occurred above
           }
@@ -59,11 +70,11 @@ describe('`nodefront compile`', function() {
     });
 
     it('Stylus files', function(done) {
-      testUtils.expectFilesToMatch(inputDir + '/style.css',
-        expectedDir + '/style.css')
+      testUtils.expectFilesToMatch(inputFilesDir + '/style.css',
+        expectedFilesDir + '/style.css')
         .fin(function() {
           try {
-            fs.unlinkSync(inputDir + '/style.css');
+            fs.unlinkSync(inputFilesDir + '/style.css');
           } catch (error) {
             // don't worry about this; an error probably occurred above
           }
@@ -73,11 +84,11 @@ describe('`nodefront compile`', function() {
     });
 
     it('Coffee files', function(done) {
-      testUtils.expectFilesToMatch(inputDir + '/script.js',
-        expectedDir + '/script.js')
+      testUtils.expectFilesToMatch(inputFilesDir + '/script.js',
+        expectedFilesDir + '/script.js')
         .fin(function() {
           try {
-            fs.unlinkSync(inputDir + '/script.js');
+            fs.unlinkSync(inputFilesDir + '/script.js');
           } catch (error) {
             // don't worry about this; an error probably occurred above
           }
@@ -96,7 +107,7 @@ describe('`nodefront compile`', function() {
         .end();
     });
 
-    confirmFilesAreCompiled();
+    confirmFilesAreCompiled(inputDirWithoutOptions, expectedDirWithoutOptions);
   });
 
   describe('watches', function() {
@@ -108,18 +119,19 @@ describe('`nodefront compile`', function() {
           // get rid of initially compiled files, as this is testing watch
           // functionality
           return q.all([
-            unlink(inputDir + '/index.html'),
-            unlink(inputDir + '/layout.html'),
-            unlink(inputDir + '/style.css'),
-            unlink(inputDir + '/script.js')
+            unlink(inputDirWithoutOptions + '/index.html'),
+            unlink(inputDirWithoutOptions + '/layout.html'),
+            unlink(inputDirWithoutOptions + '/style.css'),
+            unlink(inputDirWithoutOptions + '/script.js')
           ]);
         })
         .then(function() {
           // mock modifications of all files that need to be compiled
-          utils.mockFileModification(inputDir + '/index.jade');
-          utils.mockFileModification(inputDir + '/layout.jade');
-          utils.mockFileModification(inputDir + '/style.styl');
-          utils.mockFileModification(inputDir + '/script.coffee');
+          utils.mockFileModification(inputDirWithoutOptions + '/index.jade');
+          utils.mockFileModification(inputDirWithoutOptions + '/layout.jade');
+          utils.mockFileModification(inputDirWithoutOptions + '/style.styl');
+          utils.mockFileModification(inputDirWithoutOptions +
+            '/script.coffee');
 
           // wait for compilation to finish
           setTimeout(done, 50);
@@ -128,10 +140,30 @@ describe('`nodefront compile`', function() {
     });
 
     // confirm compilation actually happens
-    confirmFilesAreCompiled();
+    confirmFilesAreCompiled(inputDirWithoutOptions, expectedDirWithoutOptions);
 
     after(function() {
       utils.removeMockModificationListeners();
     });
+  });
+
+  describe('recognizes compiler options for', function() {
+    before(function(done) {
+      process.chdir(inputDirWithOptions);
+
+      config.withSettings('.nf/compile', function(env) {
+        compile(env, true)
+          .then(function() {
+            done();
+          })
+          .end();
+      })(defaultEnv);
+    });
+
+    after(function() {
+      process.chdir(inputDirWithoutOptions);
+    });
+
+    confirmFilesAreCompiled(inputDirWithOptions, expectedDirWithOptions);
   });
 });

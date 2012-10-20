@@ -1,0 +1,4 @@
+body{font-size:15px;background:url("images/pattern.jpg") repeat}
+h1,h2,h3,h4,h5,h6{font-weight:normal;margin-bottom:10px}
+#intro{float:left}
+#station{position:relative;margin-top:-10px}
