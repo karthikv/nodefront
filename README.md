@@ -111,6 +111,8 @@ Recursive: `nodefront compile -r/--recursive` recurses through sub-directories i
 
 Watch: `nodefront compile -w/--watch` watches all files that can be compiled in the current directory (and subdirectories if the recursive option is specified) and recompiles them upon modification. `watch` is dependency aware, meaning that if `index.jade` extends/includes `layout.jade`, when `layout.jade` is modified, both `layout.jade` and `index.jade` will be recompiled. This same awareness is present for Stylus files as well.
 
+Output: `nodefront compile -o/--output [directory]` outputs all compiled files into the given output directory. If not provided, this defaults to the current directory.
+
 ### Markdown Support
 If you'd like markdown support for Jade, simply install the [marked](https://github.com/chjj/marked) library, like so:
 

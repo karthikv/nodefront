@@ -83,7 +83,7 @@ module.exports = exports = function(env, shouldPromise) {
 
         // compile the current file and record this function
         var compileFn = generateCompileFn(fileNameSansExtension, extension,
-            env.compilerOptions);
+            env.compilerOptions, env.output);
         compileFns[fileName] = compileFn;
         promises.push(compileFn());
 
@@ -212,10 +212,13 @@ function recordDependencies(fileName, extension, contents) {
  * @param fileNameSansExtension - file name without extension
  * @param extension - the extension of the file name
  * @param compilerOptions - options to pass to the compiler for this file
+ * @param directory - the directory, relative to the current working directory,
+ *  to store the file in
  *
  * @return function to compile this file that takes no parameters
  */
-function generateCompileFn(fileNameSansExtension, extension, compilerOptions) {
+function generateCompileFn(fileNameSansExtension, extension, compilerOptions,
+    directory) {
   compilerOptions = compilerOptions || {};
 
   return function() {
@@ -230,13 +233,19 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions) {
 
     // consolidate-build will take care of picking which compiler to use;
     // simply use the file extension as a key
-    return q.ncall(build[extension], build[extension], fileName, options)
+    return utils.mkdirRecursive(directory)
+      .then(function() {
+        return q.ncall(build[extension], build[extension], fileName, options);
+      })
       .then(function(output) {
         var newExtension = compiledExtensions[extension];
-        var compiledFileName = fileNameSansExtension + '.' + newExtension;
-        var compiledFileDisplay = pathLib.relative('.', compiledFileName);
+        var compiledFilePath = fileNameSansExtension + '.' + newExtension;
 
-        return utils.writeFile(compiledFileName, output)
+        // find compiled file path in output directory
+        compiledFilePath = directory + '/' + pathLib.relative('.', compiledFilePath);
+        var compiledFileDisplay = pathLib.relative('.', compiledFilePath);
+
+        return utils.writeFile(compiledFilePath, output)
           .then(function() {
             console.log('Compiled ' + compiledFileDisplay + '.');
           });

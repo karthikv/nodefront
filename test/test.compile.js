@@ -12,6 +12,7 @@ var expectedDir = __dirname + '/resources/compile/expected';
 
 var inputDirWithoutOptions = inputDir + '/without-options';
 var inputDirWithOptions = inputDir + '/with-options';
+var outputDir = inputDir + '/compile-output';
 
 var expectedDirWithoutOptions = expectedDir + '/without-options';
 var expectedDirWithOptions = expectedDir + '/with-options';
@@ -22,7 +23,7 @@ var compile = sandboxedModule.require('../commands/compile', {
   }
 });
 
-var defaultEnv = {};
+var defaultEnv = { output: '.' };
 var originalDir = process.cwd();
 
 describe('`nodefront compile`', function() {
@@ -108,6 +109,18 @@ describe('`nodefront compile`', function() {
     });
 
     confirmFilesAreCompiled(inputDirWithoutOptions, expectedDirWithoutOptions);
+  });
+
+  describe(', given explicit output directory, compiles', function() {
+    before(function(done) {
+      compile(utils.extend(defaultEnv, { output: outputDir }), true)
+        .then(function() {
+          done();
+        })
+        .end();
+    });
+
+    confirmFilesAreCompiled(outputDir, expectedDirWithoutOptions);
   });
 
   describe('watches', function() {

@@ -18,6 +18,8 @@ program
   .option('-r, --recursive', 'Recurse through directories.')
   .option('-w, --watch', 'Recompile files upon modification. Intelligently' +
     ' recompile dependencies.')
+  .option('-o, --output <directory>', 'Put compiled files in the given' +
+    ' directory. Defaults to the current directory.', String, '.')
   .action(config.withSettings('.nf/compile', require('./commands/compile')));
 
 // serve files
