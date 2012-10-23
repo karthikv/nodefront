@@ -123,7 +123,7 @@ $ npm install -g marked
 Jade should automatically interface with it.
 
 ### Configuration Files
-Language compilers often come with a variety of options. For example, Jade has the option of compressing HTML upon compilation. Nodefront allows you to set these options via configuration files. To do so, simply create a `.nf` directory anywhere in your project tree. This means that `.nf` can be present directly in your project directory or in any of its parent directories. Then, add a `compile.json` or `compile.yml` file with a `compilerOptions` map. Each key should be a file extension and the value should be map of options to pass to the compiler for that extension. For example, to tell Jade to output pretty HTML instead of compressing it, you can use the following `.nf/compile.json` file:
+Language compilers often come with a variety of options. For example, Jade has the option of compressing HTML upon compilation. Nodefront allows you to set these options via configuration files. To do so, simply create a `.nf` directory anywhere in your project tree. This means that `.nf` can be present directly in your project directory or in any of its parent directories. Then, add a `compile.json` or `compile.yml` file with a `compilerOptions` map. Each key should be a file extension and the value should be a map of options to pass to the compiler for that extension. For example, to tell Jade to output pretty HTML instead of compressing it, you can use the following `.nf/compile.json` file:
 
 ```json
 {
