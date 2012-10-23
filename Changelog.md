@@ -1,4 +1,14 @@
 
+1.0.1 / 2012-10-22 
+==================
+
+  * Update consolidate-build to allow for CoffeeScript compiler options.
+  * Add output option to compile command.
+  * Make compiler options extension-specific.
+  * Correct stale comment.
+  * Fix deferred bug in determining which files to compile.
+  * Add line breaks to README.
+
 1.0.0 / 2012-10-04 
 ==================
 
