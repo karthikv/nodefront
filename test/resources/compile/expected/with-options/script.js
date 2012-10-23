@@ -1,18 +1,15 @@
-(function() {
-  var fs, path;
+var fs, path;
 
-  fs = require('fs');
+fs = require('fs');
 
-  path = require('path');
+path = require('path');
 
-  if (require.extensions) {
-    require.extensions['.coffee'] = function(module, filename) {
-      var content;
-      content = compile(stripBOM(fs.readFileSync(filename, 'utf8')), {
-        filename: filename
-      });
-      return module._compile(content, filename);
-    };
-  }
-
-}).call(this);
+if (require.extensions) {
+  require.extensions['.coffee'] = function(module, filename) {
+    var content;
+    content = compile(stripBOM(fs.readFileSync(filename, 'utf8')), {
+      filename: filename
+    });
+    return module._compile(content, filename);
+  };
+}
