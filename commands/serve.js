@@ -38,7 +38,7 @@ var utils = require('../lib/utils');
      promise = compile({ recursive: true, watch: true }, true);
    } else {
      // no need to run any command; just create a promise that resolves
-     promise = q.defer().resolve();
+     promise = q.resolve();
    }
 
    // create the http server
@@ -86,7 +86,7 @@ var utils = require('../lib/utils');
    if (shouldPromise) {
      return promise;
    } else {
-     promise.end();
+     promise.done();
    }
  };
 
@@ -143,7 +143,7 @@ function serveFilesLocally(port, hostname, live) {
               urlParts.pathname += '/';
               response.writeHead(301, {'Location': urlLib.format(urlParts)});
 
-              response.end();
+              response.done();
               return;
             }
 
@@ -156,7 +156,7 @@ function serveFilesLocally(port, hostname, live) {
 
           // if file exists, serve it; otherwise, return a 404
           utils.readFile(path, binary)
-            .then(function(contents) {
+            .done(function(contents) {
               // find this file's mime type or default to text/plain
               response.writeHead(200, {'Content-Type': mimeType});
 
@@ -175,8 +175,7 @@ function serveFilesLocally(port, hostname, live) {
               } else {
                 response.end(contents);
               }
-            }, respondWith404)
-            .end();
+            }, respondWith404);
         }, respondWith404);
     } else {
       // bad request error code

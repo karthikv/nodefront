@@ -102,8 +102,7 @@ describe('`nodefront fetch`', function() {
         // clean up libraries array
         delete libraries[libraryName];
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('minifies upon download', function(done) {
@@ -130,8 +129,7 @@ describe('`nodefront fetch`', function() {
       .then(function() {
         return confirmFetch(libraryName, expected, version);
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('fetches given a zip file and path', function(done) {
@@ -166,8 +164,7 @@ describe('`nodefront fetch`', function() {
         // clean up libraries array
         delete libraries[libraryName];
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   /**
@@ -197,8 +194,7 @@ describe('`nodefront fetch`', function() {
         .then(function() {
           return confirmFetch(libraryName, expected, version);
         })
-        .then(done)
-        .end();
+        .done(done);
     });
   }
 

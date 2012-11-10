@@ -100,7 +100,7 @@ module.exports = exports = function(env, shouldPromise) {
   if (shouldPromise) {
     return promise;
   } else {
-    promise.end();
+    promise.done();
   }
 };
 
@@ -116,12 +116,12 @@ module.exports = exports = function(env, shouldPromise) {
 function recompileUponModification(fileName, extension) {
   utils.watchFileForModification(fileName, 1000, function() {
     q.ncall(fs.readFile, fs, fileName, 'utf8')
-      .then(function(contents) {
+      .done(function(contents) {
         // this may be a static file that doesn't have a compile function, but
         // is a dependency for some other compiled file
         if (compileFns[fileName]) {
           compileFns[fileName]()
-            .end();
+            .done();
 
           // reset dependencies
           clearDependencies(fileName);
@@ -135,11 +135,10 @@ function recompileUponModification(fileName, extension) {
 
           if (compileFns[dependentFile]) {
             compileFns[dependentFile]()
-              .end();
+              .done();
           }
         }
-      })
-      .end();
+      });
   });
 }
 

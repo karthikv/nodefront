@@ -91,7 +91,7 @@ module.exports = exports = function(libraryPath, filePath, env,
   if (shouldPromise) {
     return promise;
   } else {
-    promise.end();
+    promise.done();
   }
 };
 

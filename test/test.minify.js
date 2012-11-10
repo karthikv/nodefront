@@ -91,8 +91,7 @@ describe('`nodefront minify`', function() {
       .fin(function() {
         return q.ncall(fs.unlink, fs, inputDir + '/script.min.js');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('minifies css files', function(done) {
@@ -108,8 +107,7 @@ describe('`nodefront minify`', function() {
       .fin(function() {
         return q.ncall(fs.unlink, fs, inputDir + '/style.min.css');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('optimizes JPG images', function(done) {
@@ -125,8 +123,7 @@ describe('`nodefront minify`', function() {
           // don't worry about this; there was likely an error earlier
         }
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('optimizes PNG images', function(done) {
@@ -142,7 +139,6 @@ describe('`nodefront minify`', function() {
           // don't worry about this; there was likely an error earlier
         }
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 });

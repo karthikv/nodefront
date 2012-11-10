@@ -142,7 +142,7 @@ module.exports = exports = function(rsFilter, env, shouldPromise) {
   if (shouldPromise) {
     return promise;
   } else {
-    promise.end();
+    promise.done();
   }
 };
 
@@ -221,15 +221,14 @@ function minify(fileName, toFileName, type) {
 
         return newContents;
       })
-      .then(function(newContents) {
+      .done(function(newContents) {
         utils.writeFile(toFileName, newContents)
           .then(function() {
             console.log('Minified ' + relativeFileName + ' to ' +
                         relativeToFileName + '.');
             deferred.resolve();
           });
-      })
-      .end();
+      });
   }
 
   return deferred.promise;

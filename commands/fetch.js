@@ -162,7 +162,7 @@ module.exports = exports = function(libraryName, env, omitSave,
   if (shouldPromise) {
     return promise;
   } else {
-    promise.end();
+    promise.done();
   }
 };
 
@@ -272,7 +272,7 @@ function runInteractiveSession(libraryName, env) {
                   'download?');
       return program.qConfirm('\nMinify the library? ');
     })
-    .then(function(minify) {
+    .done(function(minify) {
       if (minify) {
         env.minify = minify;
       }
@@ -284,8 +284,7 @@ function runInteractiveSession(libraryName, env) {
       // call fetch with the updated environment from interactive user input
       exports(libraryName, env);
       process.stdin.destroy();
-    })
-    .end();
+    });
 }
 
 /**

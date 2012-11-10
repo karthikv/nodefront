@@ -17,7 +17,7 @@ var compileMock = function(env) {
     throw new Error('watch option not provided');
   }
   
-  return q.defer().resolve();
+  return q.resolve();
 };
 
 var inputDir = __dirname + '/resources/serve/input';
@@ -69,8 +69,7 @@ describe('`nodefront serve`', function() {
         .then(function(expected) {
           responseBody.should.eql(expected);
         })
-        .then(done)
-        .end();
+        .done(done);
     });
 
     it('index.html files when visiting the containing directory',
@@ -84,8 +83,7 @@ describe('`nodefront serve`', function() {
           .then(function(expected) {
             responseBody.should.eql(expected);
           })
-          .then(done)
-          .end();
+          .done(done);
       });
 
     it('CSS files', function(done) {
@@ -98,8 +96,7 @@ describe('`nodefront serve`', function() {
         .then(function(expected) {
           responseBody.should.eql(expected);
         })
-        .then(done)
-        .end();
+        .done(done);
     });
 
     it('JS files', function(done) {
@@ -112,8 +109,7 @@ describe('`nodefront serve`', function() {
         .then(function(expected) {
           responseBody.should.eql(expected);
         })
-        .then(done)
-        .end();
+        .done(done);
     });
 
     it('Image files', function(done) {
@@ -127,8 +123,7 @@ describe('`nodefront serve`', function() {
         .then(function(expected) {
           responseBody.should.eql(expected);
         })
-        .then(done)
-        .end();
+        .done(done);
     });
   }
 
@@ -138,8 +133,7 @@ describe('`nodefront serve`', function() {
   describe('serves on default hostname and default port', function() {
     before(function(done) {
       serve(undefined, undefined, defaultEnv, true)
-        .then(done)
-        .end();
+        .done(done);
     });
 
     confirmFilesAreServed(defaultPort, defaultHostname);
@@ -149,8 +143,7 @@ describe('`nodefront serve`', function() {
   describe('serves on default hostname and custom port', function() {
     before(function(done) {
       serve(customPort, undefined, defaultEnv, true)
-        .then(done)
-        .end();
+        .done(done);
     });
 
     confirmFilesAreServed(customPort, defaultHostname);
@@ -164,12 +157,11 @@ describe('`nodefront serve`', function() {
     // error will be thrown by compile mock if an issue arises
     serve(customPort, undefined, utils.extend(defaultEnv, { compile: true }),
       true)
-      .then(function() {
+      .done(function() {
         compileCalled.should.equal(true);
         serve.server.close();
         done();
-      })
-      .end();
+      });
   });
 
   describe('updates the browser', function() {
@@ -189,7 +181,7 @@ describe('`nodefront serve`', function() {
           return browser.visit('http://' + defaultHostname + ':' + customPort +
             pageToVisit);
         })
-        .then(function() {
+        .done(function() {
           browser.success.should.equal(true);
           browser.success = false;
 
@@ -198,8 +190,7 @@ describe('`nodefront serve`', function() {
 
           // wait for socket.io to kick in before finishing
           setTimeout(done, 50);
-        })
-        .end();
+        });
     });
 
     afterEach(function() {

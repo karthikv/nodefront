@@ -15,8 +15,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document-js-footer.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes JavaScript files from HTML footer', function(done) {
@@ -26,8 +25,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('inserts JavaScript files into Jade footer', function(done) {
@@ -37,8 +35,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document-js-footer.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes JavaScript files from Jade footer', function(done) {
@@ -48,8 +45,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('inserts JavaScript files into HTML header', function(done) {
@@ -59,8 +55,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document-js-header.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes JavaScript files from HTML header', function(done) {
@@ -70,8 +65,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('inserts JavaScript files into Jade header', function(done) {
@@ -81,8 +75,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document-js-header.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes JavaScript files from Jade header', function(done) {
@@ -92,8 +85,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('inserts CSS files into HTML header', function(done) {
@@ -103,8 +95,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document-css-header.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes CSS files from HTML header', function(done) {
@@ -114,8 +105,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.html',
           expectedDir + '/document.html');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('inserts CSS files into Jade header', function(done) {
@@ -125,8 +115,7 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document-css-header.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 
   it('deletes CSS files from Jade header', function(done) {
@@ -136,7 +125,6 @@ describe('`nodefront insert`', function() {
         return testUtils.expectFilesToMatch(inputDir + '/document.jade',
           expectedDir + '/document.jade');
       })
-      .then(done)
-      .end();
+      .done(done);
   });
 });

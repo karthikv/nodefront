@@ -66,8 +66,7 @@ describe('`nodefront compile`', function() {
             // don't worry about this; an error probably occurred above
           }
         })
-        .then(done)
-        .end();
+        .done(done);
     });
 
     it('Stylus files', function(done) {
@@ -80,8 +79,7 @@ describe('`nodefront compile`', function() {
             // don't worry about this; an error probably occurred above
           }
         })
-        .then(done)
-        .end();
+        .done(done);
     });
 
     it('Coffee files', function(done) {
@@ -94,18 +92,16 @@ describe('`nodefront compile`', function() {
             // don't worry about this; an error probably occurred above
           }
         })
-        .then(done)
-        .end();
+        .done(done);
     });
   }
 
   describe('compiles', function() {
     before(function(done) {
       compile(defaultEnv, true)
-        .then(function() {
+        .done(function() {
           done();
-        })
-        .end();
+        });
     });
 
     confirmFilesAreCompiled(inputDirWithoutOptions, expectedDirWithoutOptions);
@@ -114,10 +110,9 @@ describe('`nodefront compile`', function() {
   describe(', given explicit output directory, compiles', function() {
     before(function(done) {
       compile(utils.extend(defaultEnv, { output: outputDir }), true)
-        .then(function() {
+        .done(function() {
           done();
-        })
-        .end();
+        });
     });
 
     confirmFilesAreCompiled(outputDir, expectedDirWithoutOptions);
@@ -138,7 +133,7 @@ describe('`nodefront compile`', function() {
             unlink(inputDirWithoutOptions + '/script.js')
           ]);
         })
-        .then(function() {
+        .done(function() {
           // mock modifications of all files that need to be compiled
           utils.mockFileModification(inputDirWithoutOptions + '/index.jade');
           utils.mockFileModification(inputDirWithoutOptions + '/layout.jade');
@@ -148,8 +143,7 @@ describe('`nodefront compile`', function() {
 
           // wait for compilation to finish
           setTimeout(done, 50);
-        })
-        .end();
+        });
     });
 
     // confirm compilation actually happens
@@ -166,10 +160,9 @@ describe('`nodefront compile`', function() {
 
       config.withSettings('.nf/compile', function(env) {
         compile(env, true)
-          .then(function() {
+          .done(function() {
             done();
-          })
-          .end();
+          });
       })(defaultEnv);
     });
 
