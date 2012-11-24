@@ -15,6 +15,8 @@ var compileMock = function(env) {
     throw new Error('recursive option not provided');
   } else if (!env.watch) {
     throw new Error('watch option not provided');
+  } else if (!env.output) {
+    throw new Error('output option not provided');
   }
   
   return q.resolve();
@@ -28,7 +30,9 @@ var serve = sandboxedModule.require('../commands/serve', {
   }
 });
 
-var defaultEnv = {};
+var defaultEnv = {
+  output: '.'
+};
 var originalDir = process.cwd();
 
 describe('`nodefront serve`', function() {
@@ -153,7 +157,7 @@ describe('`nodefront serve`', function() {
     });
   });
 
-  it('runs compile -wr', function(done) {
+  it('runs compile -wr -o <directory>', function(done) {
     // error will be thrown by compile mock if an issue arises
     serve(customPort, undefined, utils.extend(defaultEnv, { compile: true }),
       true)

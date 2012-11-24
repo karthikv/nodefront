@@ -26,69 +26,70 @@ var utils = require('../lib/utils');
  *
  * @param shouldPromise - if true, returns a promise that yields completion
  */
- module.exports = exports = function(port, hostname, env, shouldPromise) {
-   var server;
-   var promise;
+module.exports = exports = function(port, hostname, env, shouldPromise) {
+  var server;
+  var promise;
 
-   port = port || 3000;
-   hostname = hostname || '127.0.0.1';
+  port = port || 3000;
+  hostname = hostname || '127.0.0.1';
 
-   if (env.compile) {
-     // run the compile command
-     promise = compile({ recursive: true, watch: true }, true);
-   } else {
-     // no need to run any command; just create a promise that resolves
-     promise = q.resolve();
-   }
+  if (env.compile) {
+    // run the compile command
+    promise = compile({ recursive: true, watch: true, output: env.output },
+      true);
+  } else {
+    // no need to run any command; just create a promise that resolves
+    promise = q.resolve();
+  }
 
-   // create the http server
-   exports.server = server = serveFilesLocally(port, hostname, env.live);
+  // create the http server
+  exports.server = server = serveFilesLocally(port, hostname, env.live);
 
-   if (env.live) {
-     // initiate the socket connection
-     io = require('socket.io').listen(server);
+  if (env.live) {
+    // initiate the socket connection
+    io = require('socket.io').listen(server);
 
-     // logging is unnecessary
-     io.configure(function() {
-       io.disable('log');
-     });
+    // logging is unnecessary
+    io.configure(function() {
+      io.disable('log');
+    });
 
-     io.sockets.on('connection', function(socket) {
-       socket.on('resolvePaths', function(paths) {
-         var resolvedPaths = [];
-         var absPath;
+    io.sockets.on('connection', function(socket) {
+      socket.on('resolvePaths', function(paths) {
+        var resolvedPaths = [];
+        var absPath;
 
-         // use path library to resolve paths
-         resolvedPaths[0] = pathLib.resolve('.' + paths[0]);
-         resolvedPaths[1] = {};
-         resolvedPaths[2] = {};
+        // use path library to resolve paths
+        resolvedPaths[0] = pathLib.resolve('.' + paths[0]);
+        resolvedPaths[1] = {};
+        resolvedPaths[2] = {};
 
-         // resolve each path in the latter two arrays, keeping track of the new
-         // path and original in a map of new => original
-         for (var i = 1; i <= 2; i++) {
-           for (var j = 0; j < paths[i].length; j++) {
-             absPath = pathLib.resolve('.' + paths[i][j]);
-             resolvedPaths[i][absPath] = paths[i][j];
-           }
-         }
+        // resolve each path in the latter two arrays, keeping track of the new
+        // path and original in a map of new => original
+        for (var i = 1; i <= 2; i++) {
+          for (var j = 0; j < paths[i].length; j++) {
+            absPath = pathLib.resolve('.' + paths[i][j]);
+            resolvedPaths[i][absPath] = paths[i][j];
+          }
+        }
 
-         // let the client know
-         socket.emit('pathsResolved', resolvedPaths);
-       });
-     });
+        // let the client know
+        socket.emit('pathsResolved', resolvedPaths);
+      });
+    });
 
-     promise = promise.then(function() {
-       // communicate to client whenever file is modified
-       trackModificationsLive(io);
-     });
-   }
+    promise = promise.then(function() {
+      // communicate to client whenever file is modified
+      trackModificationsLive(io);
+    });
+  }
 
-   if (shouldPromise) {
-     return promise;
-   } else {
-     promise.done();
-   }
- };
+  if (shouldPromise) {
+    return promise;
+  } else {
+    promise.done();
+  }
+};
 
 /**
  * Function: serveFilesLocally

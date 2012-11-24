@@ -29,6 +29,10 @@ program
                ' localhost:3000.')
   .option('-c, --compile', 'Shortcut to run nodefront compile -w/--watch' +
           ' simultaneously')
+  .option('-o, --output <directory>', 'Should be used with the -c/--compile' +
+    ' option. Put compiled files in the given directory, passing this to the' +
+    ' -o/--output option of the compile command. Defaults to the current' +
+    ' directory.', String, '.')
   .option('-l, --live', 'Automatically refreshes the browser upon' +
           ' modification of HTML/CSS/JS files.')
   .action(config.withSettings('.nf/serve', require('./commands/serve')));
