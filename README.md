@@ -171,6 +171,8 @@ http://localhost:3000/css/script.js would serve ./js/script.js
 ### Options
 Compile: `nodefront serve -c/--compile` will run `nodefront compile -w/--watch` simultaneously. This allows you to modify files that need to be compiled and immediately see the updates in your browser.
 
+Output: `nodefront serve -o/--output [directory]` should be specified only if the `-c/--compile` option is used. This will output all compiled files into the given output directory specified by [directory]. If not provided, this defaults to the current directory. Note that this is simply done by passing [directory] to the `-o/--output` option of the `nodefront compile` command.
+
 Live: `nodefront serve -l/--live` will monitor each HTML page that is served to the browser and all of its CSS/JS dependencies. If the page's source itself or one of its scripts changes, the browser will automatically refresh. If a CSS stylesheet is modified, it will be reloaded without refreshing via a cache-busting query string. This allows for live development with immediate feedback and circumvents the need to keep reloading the browser manually.
 
 For those who are interested in the more technical aspects of live mode, the server that is created automatically injects web socket code, courtesy of socket.io, into HTML pages. This allows for communication between the client and the Node.js server. Whenever a file is modified, the server notifies the client via the established socket connection. The client then assesses whether this file affects the current page and takes appropriate actions.

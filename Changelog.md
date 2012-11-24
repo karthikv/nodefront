@@ -1,4 +1,10 @@
 
+1.0.4 / 2012-11-23 
+==================
+
+  * Fix compilation output bug that doesn't properly create subdirectories when running compile with both the -o and -r options.
+  * Add output option to serve command when using the -c/--compile flag. Addresses issue #29.
+
 1.0.3 / 2012-11-09 
 ==================
 
