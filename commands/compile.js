@@ -232,7 +232,7 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions,
 
     // consolidate-build will take care of picking which compiler to use;
     // simply use the file extension as a key
-    return utils.mkdirRecursive(directory)
+    return utils.mkdirRecursive(pathLib.dirname(directory + '/' + fileDisplay))
       .then(function() {
         return q.ncall(build[extension], build[extension], fileName, options);
       })
