@@ -19,7 +19,7 @@
     "mime": "1.2.x",
     "nconf": "0.6.x",
     "node-zip": "0.0.x",
-    "q": "0.8.x",
+    "q": "0.8.10",
     "request": "2.9.x",
     "socket.io": "0.9.x",
     "stylus": "0.27.x",
