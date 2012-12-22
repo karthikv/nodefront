@@ -2,7 +2,7 @@
   "name": "nodefront",
   "description": "A node-powered rapid front-end development utility",
   "author": "Karthik Viswanathan <me@karthikv.net>",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "homepage": "http://karthikv.github.com/nodefront/",
   "bin": {
     "nodefront": "./nodefront.js"

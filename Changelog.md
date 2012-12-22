@@ -1,4 +1,9 @@
 
+1.0.5 / 2012-12-22 
+==================
+
+  * Freeze q at version 0.8.10 to prevent deprecation errors.
+
 1.0.4 / 2012-11-23 
 ==================
 
