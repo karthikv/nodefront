@@ -1,4 +1,9 @@
 
+1.0.6 / 2012-12-26 
+==================
+
+  * Use latest jade, stylus, and coffee-script versions.
+
 1.0.5 / 2012-12-22 
 ==================
 
