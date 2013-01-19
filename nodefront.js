@@ -99,7 +99,7 @@ program
   .option('-i, --images', 'Shortcut to optimize all JPEG/PNG files.')
   .option('-p, --plain', 'Switch to plain text mode, where [fileRegex] is no' +
           ' longer a regular expression, but just the path to a file.')
-  .action(config.withSettings('.nf/insert', require('./commands/minify')));
+  .action(config.withSettings('.nf/minify', require('./commands/minify')));
 
 program.parse(process.argv);
 
