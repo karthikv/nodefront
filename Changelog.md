@@ -1,4 +1,10 @@
 
+1.0.7 / 2013-01-18 
+==================
+
+  * Use correct configuration file for minify command (fix typo).
+  * Fix tests to account for latest version of jade.
+
 1.0.6 / 2012-12-26 
 ==================
 
