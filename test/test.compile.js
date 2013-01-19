@@ -142,7 +142,7 @@ describe('`nodefront compile`', function() {
             '/script.coffee');
 
           // wait for compilation to finish
-          setTimeout(done, 50);
+          setTimeout(done, 100);
         });
     });
 
