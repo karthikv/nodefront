@@ -1,7 +1,7 @@
 var fs = require('fs');
 var q = require('q');
 var pathLib = require('path');
-var build = require('consolidate-build');
+var build = require('transformers');
 var utils = require('../lib/utils');
 
 // files with these extensions need to be compiled;
@@ -234,7 +234,7 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions,
     // simply use the file extension as a key
     return utils.mkdirRecursive(pathLib.dirname(directory + '/' + fileDisplay))
       .then(function() {
-        return q.ncall(build[extension], build[extension], fileName, options);
+        return build[extension].renderFile(fileName, options);
       })
       .then(function(output) {
         var newExtension = compiledExtensions[extension];
