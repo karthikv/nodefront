@@ -239,9 +239,15 @@ function generateCompileFn(fileNameSansExtension, extension, compilerOptions,
       .then(function(output) {
         var newExtension = compiledExtensions[extension];
         var compiledFilePath = fileNameSansExtension + '.' + newExtension;
+        var compiledBasePath = pathLib.basename(compiledFilePath);
 
-        // find compiled file path in output directory
-        compiledFilePath = directory + '/' + pathLib.relative('.', compiledFilePath);
+        if (options.output) {
+            // use the output option
+            compiledFilePath = pathLib.join(directory, pathLib.relative('.', options.output), compiledBasePath);
+        } else {
+            // find compiled file path in output directory
+            compiledFilePath = pathLib.join(directory, pathLib.relative('.', compiledFilePath));
+        }
         var compiledFileDisplay = pathLib.relative('.', compiledFilePath);
 
         return utils.writeFile(compiledFilePath, output)
